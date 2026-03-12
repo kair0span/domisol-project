@@ -19,7 +19,7 @@ import { ScoresService } from './scores.service';
 @ApiTags('Scores')
 @Controller('scores')
 export class ScoresController {
-  constructor(private readonly scoresService: ScoresService) {}
+  constructor(private readonly scoresService: ScoresService) { }
 
   @Get()
   @ZodResponse({ type: [ScoreResponseDto] })

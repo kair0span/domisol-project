@@ -144,7 +144,6 @@ function ScoreCard({ score }: { score: Score }) {
         <div className="flex flex-wrap items-center gap-4">
           {location && (
             <div className="inline-flex items-center gap-2 text-sm">
-              <div className="h-2 w-2 rounded-full bg-chart-3 shadow-sm" />
               <span className="font-medium text-foreground/80">{location}</span>
             </div>
           )}
@@ -152,7 +151,7 @@ function ScoreCard({ score }: { score: Score }) {
             <time className="text-xs text-muted-foreground font-medium">
               {createdDate.toLocaleDateString('bg-BG', {
                 year: 'numeric',
-                month: 'short',
+                month: 'long',
                 day: 'numeric',
               })}
             </time>
@@ -165,7 +164,7 @@ function ScoreCard({ score }: { score: Score }) {
           className="hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-200 group-hover:shadow-sm"
         >
           <Link to="/scores/$scoreId" params={{ scoreId: id }}>
-            View details
+            Към песента
           </Link>
         </Button>
       </CardFooter>
