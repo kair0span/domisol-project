@@ -24,38 +24,38 @@ export class ScoresController {
   @Get()
   @ZodResponse({ type: [ScoreResponseDto] })
   @ApiOperation({ summary: 'Get all scores' })
-  findAll(): ScoreResponseDto[] {
+  async findAll(): Promise<ScoreResponseDto[]> {
     return this.scoresService.findAll();
   }
 
   @Get(':id')
   @ZodResponse({ type: ScoreResponseDto })
   @ApiOperation({ summary: 'Get a score by ID' })
-  findOne(@Param('id') id: string): ScoreResponseDto {
+  async findOne(@Param('id') id: string): Promise<ScoreResponseDto> {
     return this.scoresService.findOne(id);
   }
 
   @Post()
   @ZodResponse({ type: ScoreResponseDto })
   @ApiOperation({ summary: 'Create a new score' })
-  create(@Body() createScoreDto: CreateScoreDto): ScoreResponseDto {
+  async create(@Body() createScoreDto: CreateScoreDto): Promise<ScoreResponseDto> {
     return this.scoresService.create(createScoreDto);
   }
 
   @Patch(':id')
   @ZodResponse({ type: ScoreResponseDto })
   @ApiOperation({ summary: 'Update an existing user' })
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateScoreDto: UpdateScoreDto,
-  ): ScoreResponseDto {
+  ): Promise<ScoreResponseDto> {
     return this.scoresService.update(id, updateScoreDto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete a score' })
-  remove(@Param('id') id: string): void {
-    this.scoresService.remove(id);
+  async remove(@Param('id') id: string): Promise<void> {
+    return this.scoresService.remove(id);
   }
 }

@@ -7,10 +7,10 @@ export const UserSchema = z
   .object({
     id: z.string().uuid(),
     name: z.string().min(1, "Name is required").max(100),
-    email: z.string().email("Invalid email address"),
-    age: z.number().int().min(0).max(150),
+    email: z.string().email(),
+    password: z.string().min(1, "Password is required").max(100),
     role: UserRole,
-    createdAt: z.iso.datetime(),
+    createdAt: z.string().datetime(),
   })
   .meta({ id: "User" });
 
