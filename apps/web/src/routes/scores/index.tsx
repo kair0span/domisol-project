@@ -7,7 +7,6 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-  CardDescription,
 } from "#/components/ui/card";
 import { Badge } from "#/components/ui/badge";
 import { Button } from "#/components/ui/button";
@@ -51,32 +50,63 @@ function ScoreCard({ score }: { score: Score }) {
     color,
     location,
     description,
-    createdAt,
+    genre,
+    date
   } = score;
 
-  const createdDate = createdAt ? new Date(createdAt) : null;
+  const scoreDate = date ? new Date(date) : null;
+
+  // Map color names to Tailwind classes
+  const colorMap: Record<string, string> = {
+    red: 'bg-red-500',
+    blue: 'bg-blue-500',
+    green: 'bg-green-500',
+    yellow: 'bg-yellow-500',
+    purple: 'bg-purple-500',
+    pink: 'bg-pink-500',
+    orange: 'bg-orange-500',
+    indigo: 'bg-indigo-500',
+    cyan: 'bg-cyan-500',
+    emerald: 'bg-emerald-500',
+    rose: 'bg-rose-500',
+    amber: 'bg-amber-500',
+    lime: 'bg-lime-500',
+    teal: 'bg-teal-500',
+    sky: 'bg-sky-500',
+    violet: 'bg-violet-500',
+    fuchsia: 'bg-fuchsia-500',
+  };
+
+  const colorClass = color ? colorMap[color.toLowerCase()] || 'bg-gray-500' : 'bg-gray-500';
 
   return (
-    <Card className="group h-full transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1 border-border/50 hover:border-border">
-      <CardHeader className="space-y-4">
+    <Card className="group h-full transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-2 border-border/40 hover:border-primary/30 overflow-hidden">
+      {/* Color accent bar */}
+      {/* <div className={`h-1.5 ${colorClass}`} /> */}
+
+      <CardHeader className="space-y-4 pb-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <CardTitle className="text-xl font-semibold leading-tight text-card-foreground group-hover:text-primary transition-colors duration-200 line-clamp-2">
+            <CardTitle className="text-2xl font-bold leading-tight text-card-foreground group-hover:text-primary transition-colors duration-200 line-clamp-2 mb-3">
               {title}
             </CardTitle>
             {(composer || lyricist) && (
-              <div className="mt-2 space-y-1">
+              <div className="space-y-1.5">
                 {composer && (
-                  <CardDescription className="text-sm font-medium text-muted-foreground">
-                    <span className="text-xs uppercase tracking-wide text-muted-foreground/70">Музика:</span>{" "}
-                    <span className="text-foreground/80">{composer}</span>
-                  </CardDescription>
+                  <div className="flex items-center gap-2">
+                    <svg className="w-4 h-4 text-muted-foreground shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                    </svg>
+                    <span className="text-sm text-foreground/90 font-medium">{composer}</span>
+                  </div>
                 )}
                 {lyricist && (
-                  <CardDescription className="text-sm text-muted-foreground">
-                    <span className="text-xs uppercase tracking-wide text-muted-foreground/70">Текст:</span>{" "}
-                    <span className="text-foreground/70">{lyricist}</span>
-                  </CardDescription>
+                  <div className="flex items-center gap-2">
+                    <svg className="w-4 h-4 text-muted-foreground shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    <span className="text-sm text-foreground/80">{lyricist}</span>
+                  </div>
                 )}
               </div>
             )}
@@ -84,74 +114,78 @@ function ScoreCard({ score }: { score: Score }) {
           {category && (
             <Badge
               variant="secondary"
-              className="capitalize shrink-0 bg-primary/10 text-primary border-primary/20 hover:bg-primary/15 transition-colors"
+              className="capitalize shrink-0 bg-primary/15 text-primary border-primary/30 hover:bg-primary/20 transition-colors font-semibold px-3 py-1"
             >
               {category}
             </Badge>
           )}
         </div>
-
-        {(key || color) && (
-          <div className="flex flex-wrap items-center gap-4 pt-2 border-t border-border/30">
-            {key && (
-              <div className="inline-flex items-center gap-2 px-2 py-1 rounded-md bg-muted/50">
-                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                  Key
-                </span>
-                <span className="text-sm font-semibold text-foreground tabular-nums">
-                  {key}
-                </span>
-              </div>
-            )}
-            {color && (
-              <div className="inline-flex items-center gap-2 px-2 py-1 rounded-md bg-muted/50">
-                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                  Color
-                </span>
-
-                <span
-                  className="h-3 w-3 rounded-full border-2 border-background shadow-sm ring-1 ring-border/20"
-                  style={{ backgroundColor: color }}
-                />
-
-              </div>
-            )}
-          </div>
-        )}
       </CardHeader>
 
+
+      <CardContent className="pt-0 pb-4">
+        <div className="flex flex-wrap gap-2">
+          {genre && (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted/60 border border-border/50">
+              <span className="text-xs font-semibold text-foreground/80 capitalize">
+                {genre}
+              </span>
+            </div>
+          )}
+          {key && (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20">
+              <svg className="w-3.5 h-3.5 text-primary" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+              </svg>
+              <span className="text-xs font-bold text-primary">
+                {key}
+              </span>
+            </div>
+          )}
+
+          {color && (
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/60 border border-border/50">
+              <span
+                className={`h-3 w-3 rounded-full ${colorClass} ring-2 ring-background shadow-md`}
+                title={color}
+              />
+              <span className="text-xs font-medium text-foreground/70 capitalize">
+                {color}
+              </span>
+            </div>
+          )}
+
+        </div>
+      </CardContent>
+
       {description && (
-        <CardContent className="pt-0">
-          <div className="relative bg-muted/30 rounded-lg p-4 border border-border/20">
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              {description.length > 120 ? (
-                <>
-                  {description.slice(0, 120).trim()}
-                  {description.length > 120 && !description.slice(0, 120).endsWith('.') && '...'}
-                </>
-              ) : (
-                description
-              )}
-            </p>
-            {description.length > 120 && (
-              <div className="absolute bottom-0 right-0 h-6 w-12 bg-gradient-to-l from-muted/30 to-transparent pointer-events-none" />
-            )}
-          </div>
+        <CardContent className="pt-0 pb-4">
+          <p className="text-sm text-muted-foreground leading-relaxed line-clamp-6">
+            {description}
+          </p>
         </CardContent>
       )}
 
-      <CardFooter className="border-t border-border/30 bg-muted/20 flex items-center justify-between">
-        <div className="flex flex-wrap items-center gap-4">
+
+      <CardFooter className="border-t border-border/40 bg-gradient-to-br from-muted/30 to-muted/10 flex items-center justify-between pt-4">
+        <div className="inline-flex items-center gap-4 text-xs text-muted-foreground">
           {location && (
-            <div className="inline-flex items-center gap-2 text-sm">
-              <span className="font-medium text-foreground/80">{location}</span>
+            <div className="inline-flex items-center gap-1.5">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <span className="font-medium">{location}</span>
             </div>
           )}
-          {createdDate && (
-            <time className="text-xs text-muted-foreground font-medium">
-              {createdDate.toLocaleDateString('bg-BG', {
+          {scoreDate && (
+            <time className="inline-flex items-center gap-1.5">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              {scoreDate.toLocaleDateString('bg-BG', {
                 year: 'numeric',
-                month: 'long',
+                month: 'short',
                 day: 'numeric',
               })}
             </time>
@@ -160,11 +194,10 @@ function ScoreCard({ score }: { score: Score }) {
         <Button
           asChild
           size="sm"
-          variant="outline"
-          className="hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-200 group-hover:shadow-sm"
+          className="bg-primary/90 hover:bg-primary text-primary-foreground shadow-sm hover:shadow-md transition-all duration-200"
         >
           <Link to="/scores/$scoreId" params={{ scoreId: id }}>
-            Към песента
+            Виж повече
           </Link>
         </Button>
       </CardFooter>

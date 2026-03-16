@@ -8,7 +8,7 @@ export const UserSchema = z
     id: z.string().uuid(),
     name: z.string().min(1, "Name is required").max(100),
     email: z.string().email("Invalid email address"),
-    age: z.number().int().min(0).max(150),
+    password: z.string().min(6, "Password must be at least 6 characters"),
     role: UserRole,
     createdAt: z.iso.datetime(),
   })

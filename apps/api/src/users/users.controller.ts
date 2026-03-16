@@ -19,43 +19,43 @@ import { UsersService } from './users.service';
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @Get()
   @ZodResponse({ type: [UserResponseDto] })
   @ApiOperation({ summary: 'Get all users' })
-  findAll(): UserResponseDto[] {
+  async findAll(): Promise<UserResponseDto[]> {
     return this.usersService.findAll();
   }
 
   @Get(':id')
   @ZodResponse({ type: UserResponseDto })
   @ApiOperation({ summary: 'Get a user by ID' })
-  findOne(@Param('id') id: string): UserResponseDto {
+  async findOne(@Param('id') id: string): Promise<UserResponseDto> {
     return this.usersService.findOne(id);
   }
 
   @Post()
   @ZodResponse({ type: UserResponseDto })
   @ApiOperation({ summary: 'Create a new user' })
-  create(@Body() createUserDto: CreateUserDto): UserResponseDto {
+  async create(@Body() createUserDto: CreateUserDto): Promise<UserResponseDto> {
     return this.usersService.create(createUserDto);
   }
 
   @Patch(':id')
   @ZodResponse({ type: UserResponseDto })
   @ApiOperation({ summary: 'Update an existing user' })
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
-  ): UserResponseDto {
+  ): Promise<UserResponseDto> {
     return this.usersService.update(id, updateUserDto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete a user' })
-  remove(@Param('id') id: string): void {
-    this.usersService.remove(id);
+  async remove(@Param('id') id: string): Promise<void> {
+    return this.usersService.remove(id);
   }
 }

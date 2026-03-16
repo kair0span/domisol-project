@@ -1,64 +1,82 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { randomUUID } from "crypto";
-import type { CreateUser, UpdateUser, User } from "@repo/schemas";
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import type { CreateUser, UpdateUser, User } from '@repo/schemas';
+import { DATABASE_CONNECTION } from 'src/database/database-connection';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import { eq } from 'drizzle-orm';
+import * as userSchema from './schema';
+import * as scoreSchema from '../scores/schema';
+
+type DatabaseSchema = typeof userSchema & typeof scoreSchema;
 
 @Injectable()
 export class UsersService {
-  private users: User[] = [
-    {
-      id: randomUUID(),
-      name: "Alice Johnson",
-      email: "alice@example.com",
-      age: 30,
-      role: "admin",
-      createdAt: new Date("2024-01-15").toISOString(),
-    },
-    {
-      id: randomUUID(),
-      name: "Bob Smith",
-      email: "bob@example.com",
-      age: 25,
-      role: "user",
-      createdAt: new Date("2024-02-20").toISOString(),
-    },
-  ];
+  constructor(
+    @Inject(DATABASE_CONNECTION)
+    private readonly database: NodePgDatabase<DatabaseSchema>,
+  ) {}
 
-  findAll(): User[] {
-    return this.users;
+  async findAll(): Promise<User[]> {
+    const users = await this.database.query.users.findMany({
+      with: { scores: true },
+    });
+    return users.map((user) => ({
+      ...user,
+      createdAt: user.createdAt.toISOString(),
+    }));
   }
 
-  findOne(id: string): User {
-    const user = this.users.find((u) => u.id === id);
+  async findOne(id: string): Promise<User> {
+    const user = await this.database.query.users.findFirst({
+      where: eq(userSchema.users.id, id),
+    });
+
     if (!user) {
       throw new NotFoundException(`User with id "${id}" not found`);
     }
-    return user;
-  }
 
-  create(data: CreateUser): User {
-    const user: User = {
-      id: randomUUID(),
-      ...data,
-      createdAt: new Date().toISOString(),
+    return {
+      ...user,
+      createdAt: user.createdAt.toISOString(),
     };
-    this.users.push(user);
-    return user;
   }
 
-  update(id: string, data: UpdateUser): User {
-    const index = this.users.findIndex((u) => u.id === id);
-    if (index === -1) {
-      throw new NotFoundException(`User with id "${id}" not found`);
-    }
-    this.users[index] = { ...this.users[index], ...data };
-    return this.users[index];
+  async create(data: CreateUser): Promise<User> {
+    const [user] = await this.database
+      .insert(userSchema.users)
+      .values(data)
+      .returning();
+
+    return {
+      ...user,
+      createdAt: user.createdAt.toISOString(),
+    };
   }
 
-  remove(id: string): void {
-    const index = this.users.findIndex((u) => u.id === id);
-    if (index === -1) {
+  async update(id: string, data: UpdateUser): Promise<User> {
+    const [user] = await this.database
+      .update(userSchema.users)
+      .set(data)
+      .where(eq(userSchema.users.id, id))
+      .returning();
+
+    if (!user) {
       throw new NotFoundException(`User with id "${id}" not found`);
     }
-    this.users.splice(index, 1);
+
+    return {
+      ...user,
+      createdAt: user.createdAt.toISOString(),
+    };
+  }
+
+  async remove(id: string): Promise<void> {
+    const [deleted] = await this.database
+      .delete(userSchema.users)
+      .where(eq(userSchema.users.id, id))
+      .returning();
+
+    if (!deleted) {
+      throw new NotFoundException(`User with id "${id}" not found`);
+    }
   }
 }

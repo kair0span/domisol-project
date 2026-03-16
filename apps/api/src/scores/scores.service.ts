@@ -1,152 +1,79 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { randomUUID } from 'crypto';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import type { CreateScore, UpdateScore, Score } from '@repo/schemas';
+import { DATABASE_CONNECTION } from 'src/database/database-connection';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import { eq } from 'drizzle-orm';
+import * as schema from './schema';
 
 @Injectable()
 export class ScoresService {
-  private scores: Score[] = [
-    {
-      id: randomUUID(),
-      title: 'Вехади',
-      composer: 'Петър Дънов',
-      lyricist: 'Петър Дънов',
-      description: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.',
-      location: 'София, Изгрев',
-      category: 'от Учителя',
-      color: 'red',
-      key: 'd moll',
-      lyrics: 'Вехади, вехади, вехади, вехади, вехади, вехади, вехади, вехади',
-      createdAt: new Date('1932-01-15').toISOString(),
-    },
-    {
-      id: randomUUID(),
-      title: 'Една вечна Истина ...',
-      composer: 'Петър Дънов',
-      lyricist: 'Петър Дънов',
-      description: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.',
-      location: 'София, Изгрев',
-      category: 'след 1944',
-      color: 'red',
-      key: 'd moll',
-      lyrics: 'Една вечна Истина, която е Бог на Любовта',
-      createdAt: new Date('1932-01-15').toISOString(),
-    },
-    {
-      id: randomUUID(),
-      title: 'Венир, бенир',
-      composer: 'Петър Дънов',
-      lyricist: 'Петър Дънов',
-      description: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.',
-      location: 'София, Изгрев',
-      category: 'от Учителя',
-      color: 'red',
-      key: 'C dur',
-      lyrics: 'Венир, бенир, венир, бенир, венир, бенир, венир, бенир',
-      createdAt: new Date('1924-01-15').toISOString(),
-    },
-    {
-      id: randomUUID(),
-      title: 'Мусала',
-      composer: 'Петър Дънов',
-      lyricist: 'Петър Дънов',
-      description: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.',
-      location: 'София, Изгрев',
-      category: 'от Учителя',
-      color: 'red',
-      key: 'C dur',
-      lyrics: 'Мусала, Мусала, Мусала, Мусала',
-      createdAt: new Date('1924-01-15').toISOString(),
-    },
-    {
-      id: randomUUID(),
-      title: 'Нева санзу',
-      composer: 'Петър Дънов',
-      lyricist: 'Петър Дънов',
-      description: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.',
-      location: 'София, Изгрев',
-      category: 'от Учителя',
-      color: 'red',
-      key: 'C dur',
-      lyrics: 'Мусала, Мусала, Мусала, Мусала',
-      createdAt: new Date('1924-01-15').toISOString(),
-    },
-    {
-      id: randomUUID(),
-      title: 'Кажи ми ти Истината',
-      composer: 'Петър Дънов',
-      lyricist: 'Петър Дънов',
-      description: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.',
-      location: 'София, Изгрев',
-      category: 'от Учителя',
-      color: 'red',
-      key: 'C dur',
-      lyrics: 'Мусала, Мусала, Мусала, Мусала',
-      createdAt: new Date('1924-01-15').toISOString(),
-    },
-    {
-      id: randomUUID(),
-      title: 'Милост, благост',
-      composer: 'Петър Дънов',
-      lyricist: 'Петър Дънов',
-      description: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.',
-      location: 'София, Изгрев',
-      category: 'от Учителя',
-      color: 'red',
-      key: 'C dur',
-      lyrics: 'Мусала, Мусала, Мусала, Мусала',
-      createdAt: new Date('1924-01-15').toISOString(),
-    },
-    {
-      id: randomUUID(),
-      title: 'Братство, единство',
-      composer: 'Петър Дънов',
-      lyricist: 'Петър Дънов',
-      description: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.',
-      location: 'София, Изгрев',
-      category: 'братски',
-      color: 'red',
-      key: 'C dur',
-      lyrics: 'Мусала, Мусала, Мусала, Мусала',
-      createdAt: new Date('1924-01-15').toISOString(),
-    },
-  ];
+  constructor(
+    @Inject(DATABASE_CONNECTION)
+    private readonly database: NodePgDatabase<typeof schema>,
+  ) {}
 
-  findAll(): Score[] {
-    return this.scores;
+  async findAll(): Promise<Score[]> {
+    const scores = await this.database.query.scores.findMany({
+      with: { user: true },
+    });
+    return scores.map((score) => ({
+      ...score,
+      createdAt: score.createdAt.toISOString(),
+    }));
   }
 
-  findOne(id: string): Score {
-    const score = this.scores.find((s) => s.id === id);
+  async findOne(id: string): Promise<Score> {
+    const score = await this.database.query.scores.findFirst({
+      where: eq(schema.scores.id, id),
+    });
+
     if (!score) {
       throw new NotFoundException(`Score with id "${id}" not found`);
     }
-    return score;
-  }
 
-  create(data: CreateScore): Score {
-    const score: Score = {
-      id: randomUUID(),
-      ...data,
-      createdAt: new Date().toISOString(),
+    return {
+      ...score,
+      createdAt: score.createdAt.toISOString(),
     };
-    this.scores.push(score);
-    return score;
   }
 
-  update(id: string, data: UpdateScore): Score {
-    const index = this.scores.findIndex((s) => s.id === id);
-    if (index === -1) {
+  async create(data: CreateScore): Promise<Score> {
+    const [score] = await this.database
+      .insert(schema.scores)
+      .values(data)
+      .returning();
+
+    return {
+      ...score,
+      createdAt: score.createdAt.toISOString(),
+    };
+  }
+
+  async update(id: string, data: UpdateScore): Promise<Score> {
+    const [score] = await this.database
+      .update(schema.scores)
+      .set(data)
+      .where(eq(schema.scores.id, id))
+      .returning();
+
+    if (!score) {
       throw new NotFoundException(`Score with id "${id}" not found`);
     }
-    this.scores[index] = { ...this.scores[index], ...data };
-    return this.scores[index];
+
+    return {
+      ...score,
+      createdAt: score.createdAt.toISOString(),
+    };
   }
 
-  remove(id: string): void {
-    const index = this.scores.findIndex((u) => u.id === id);
-    if (index === -1) {
-      throw new NotFoundException(`User with id "${id}" not found`);
+  async remove(id: string): Promise<void> {
+    const [deleted] = await this.database
+      .delete(schema.scores)
+      .where(eq(schema.scores.id, id))
+      .returning();
+
+    if (!deleted) {
+      throw new NotFoundException(`Score with id "${id}" not found`);
     }
-    this.scores.splice(index, 1);
   }
 }
