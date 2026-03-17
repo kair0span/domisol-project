@@ -22,6 +22,10 @@ export class UsersService {
     return users.map((user) => ({
       ...user,
       createdAt: user.createdAt.toISOString(),
+      scores: user.scores?.map((score) => ({
+        ...score,
+        createdAt: score.createdAt.toISOString(),
+      })),
     }));
   }
 

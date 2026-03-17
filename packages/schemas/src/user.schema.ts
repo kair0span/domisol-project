@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ScoreSchema } from "./score.schema";
 
 export const UserRole = z.enum(["admin", "user", "moderator"]);
 export type UserRole = z.infer<typeof UserRole>;
@@ -29,5 +30,7 @@ export const UpdateUserSchema = CreateUserSchema.partial().meta({
 
 export type UpdateUser = z.infer<typeof UpdateUserSchema>;
 
-export const UserResponseSchema = UserSchema.meta({ id: "UserResponse" });
+export const UserResponseSchema = UserSchema.extend({
+  scores: z.array(ScoreSchema).optional(),
+}).meta({ id: "UserResponse" });
 export type UserResponse = z.infer<typeof UserResponseSchema>;

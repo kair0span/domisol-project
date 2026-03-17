@@ -82,12 +82,12 @@ function ScoreCard({ score }: { score: Score }) {
   return (
     <Card className="group h-full transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-2 border-border/40 hover:border-primary/30 overflow-hidden">
       {/* Color accent bar */}
-      {/* <div className={`h-1.5 ${colorClass}`} /> */}
+      <div className={`h-1.5 ${colorClass}`} />
 
       <CardHeader className="space-y-4 pb-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <CardTitle className="text-2xl font-bold leading-tight text-card-foreground group-hover:text-primary transition-colors duration-200 line-clamp-2 mb-3">
+            <CardTitle className="text-xl font-bold leading-tight text-card-foreground group-hover:text-primary transition-colors duration-200 line-clamp-2 mb-3">
               {title}
             </CardTitle>
             {(composer || lyricist) && (
