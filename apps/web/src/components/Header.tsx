@@ -12,8 +12,8 @@ export default function Header() {
       </Link>
       <nav className="flex gap-4">
         <ModeToggle />
-        <Button>
-         Login
+        <Button asChild>
+          <Link to="/auth/login">Login</Link>
         </Button>
       </nav>
     </header>

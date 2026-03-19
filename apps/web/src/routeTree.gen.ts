@@ -12,7 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ScoresIndexRouteImport } from './routes/scores/index'
+import { Route as ScoresScoreAddRouteImport } from './routes/scores/score-add'
 import { Route as ScoresScoreIdRouteImport } from './routes/scores/$scoreId'
+import { Route as AuthSingupIndexRouteImport } from './routes/auth/singup/index'
+import { Route as AuthLoginIndexRouteImport } from './routes/auth/login/index'
 
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
@@ -29,9 +32,24 @@ const ScoresIndexRoute = ScoresIndexRouteImport.update({
   path: '/scores/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ScoresScoreAddRoute = ScoresScoreAddRouteImport.update({
+  id: '/scores/score-add',
+  path: '/scores/score-add',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ScoresScoreIdRoute = ScoresScoreIdRouteImport.update({
   id: '/scores/$scoreId',
   path: '/scores/$scoreId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthSingupIndexRoute = AuthSingupIndexRouteImport.update({
+  id: '/auth/singup/',
+  path: '/auth/singup/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthLoginIndexRoute = AuthLoginIndexRouteImport.update({
+  id: '/auth/login/',
+  path: '/auth/login/',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -39,34 +57,68 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/scores/$scoreId': typeof ScoresScoreIdRoute
+  '/scores/score-add': typeof ScoresScoreAddRoute
   '/scores/': typeof ScoresIndexRoute
+  '/auth/login/': typeof AuthLoginIndexRoute
+  '/auth/singup/': typeof AuthSingupIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/scores/$scoreId': typeof ScoresScoreIdRoute
+  '/scores/score-add': typeof ScoresScoreAddRoute
   '/scores': typeof ScoresIndexRoute
+  '/auth/login': typeof AuthLoginIndexRoute
+  '/auth/singup': typeof AuthSingupIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/scores/$scoreId': typeof ScoresScoreIdRoute
+  '/scores/score-add': typeof ScoresScoreAddRoute
   '/scores/': typeof ScoresIndexRoute
+  '/auth/login/': typeof AuthLoginIndexRoute
+  '/auth/singup/': typeof AuthSingupIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/scores/$scoreId' | '/scores/'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/scores/$scoreId'
+    | '/scores/score-add'
+    | '/scores/'
+    | '/auth/login/'
+    | '/auth/singup/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/scores/$scoreId' | '/scores'
-  id: '__root__' | '/' | '/about' | '/scores/$scoreId' | '/scores/'
+  to:
+    | '/'
+    | '/about'
+    | '/scores/$scoreId'
+    | '/scores/score-add'
+    | '/scores'
+    | '/auth/login'
+    | '/auth/singup'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/scores/$scoreId'
+    | '/scores/score-add'
+    | '/scores/'
+    | '/auth/login/'
+    | '/auth/singup/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   ScoresScoreIdRoute: typeof ScoresScoreIdRoute
+  ScoresScoreAddRoute: typeof ScoresScoreAddRoute
   ScoresIndexRoute: typeof ScoresIndexRoute
+  AuthLoginIndexRoute: typeof AuthLoginIndexRoute
+  AuthSingupIndexRoute: typeof AuthSingupIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -92,11 +144,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ScoresIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/scores/score-add': {
+      id: '/scores/score-add'
+      path: '/scores/score-add'
+      fullPath: '/scores/score-add'
+      preLoaderRoute: typeof ScoresScoreAddRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/scores/$scoreId': {
       id: '/scores/$scoreId'
       path: '/scores/$scoreId'
       fullPath: '/scores/$scoreId'
       preLoaderRoute: typeof ScoresScoreIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/singup/': {
+      id: '/auth/singup/'
+      path: '/auth/singup'
+      fullPath: '/auth/singup/'
+      preLoaderRoute: typeof AuthSingupIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/login/': {
+      id: '/auth/login/'
+      path: '/auth/login'
+      fullPath: '/auth/login/'
+      preLoaderRoute: typeof AuthLoginIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -106,7 +179,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   ScoresScoreIdRoute: ScoresScoreIdRoute,
+  ScoresScoreAddRoute: ScoresScoreAddRoute,
   ScoresIndexRoute: ScoresIndexRoute,
+  AuthLoginIndexRoute: AuthLoginIndexRoute,
+  AuthSingupIndexRoute: AuthSingupIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

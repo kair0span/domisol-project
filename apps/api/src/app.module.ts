@@ -7,9 +7,10 @@ import { UsersModule } from "./users/users.module";
 import { ScoresModule } from './scores/scores.module';
 import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from "@nestjs/config";
+import { UploadModule } from './upload/upload.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), UsersModule, ScoresModule, DatabaseModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), UsersModule, ScoresModule, DatabaseModule, UploadModule],
   providers: [
     { provide: APP_PIPE, useClass: ZodValidationPipe },
     { provide: APP_INTERCEPTOR, useClass: ZodSerializerInterceptor },
