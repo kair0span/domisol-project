@@ -10,7 +10,8 @@ import {
   CardTitle,
 } from "#/components/ui/card";
 import { z } from "zod";
-import { addScore, type CreateScore } from "#/lib/api";
+import { addScore, uploadFile, type CreateScore } from "#/lib/api";
+import { useState } from "react";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -25,6 +26,7 @@ const formSchema = z.object({
   date: z.string().min(1, "Date is required"),
   lyrics: z.string().min(1, "Lyrics is required"),
   userId: z.string().min(1, "UserId is required"),
+  file: z.any().refine((file) => file, "Score file is required"),
 });
 
 export const Route = createFileRoute("/scores/score-add")({
@@ -33,6 +35,8 @@ export const Route = createFileRoute("/scores/score-add")({
 
 function RouteComponent() {
   const router = useRouter();
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const { Field, handleSubmit } = useForm({
     defaultValues: {
@@ -48,13 +52,29 @@ function RouteComponent() {
       date: "",
       lyrics: "",
       userId: "df63f948-1b5d-4f57-abf8-dea6f0d54307", // TODO: Get actual user ID from auth
-    } as CreateScore,
+      file: null,
+    } as CreateScore & { file: File | null },
     onSubmit: async ({ value }) => {
       try {
-        await addScore(value);
+        setIsUploading(true);
+        setUploadError(null);
+
+        // Upload file if selected
+        if (value.file) {
+          await uploadFile(value.file);
+        }
+
+        // Create score record (excluding file from the score data)
+        const { file: _, ...scoreData } = value;
+        await addScore(scoreData as CreateScore);
         router.navigate({ to: "/scores" });
       } catch (error) {
         console.error("Failed to add score:", error);
+        setUploadError(
+          error instanceof Error ? error.message : "Upload failed",
+        );
+      } finally {
+        setIsUploading(false);
       }
     },
     validators: {
@@ -113,7 +133,7 @@ function RouteComponent() {
                     }}
                   </Field>
                 </div>
-                
+
                 <div className="space-y-2">
                   <label
                     htmlFor="composer"
@@ -429,24 +449,58 @@ function RouteComponent() {
                   htmlFor="file"
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
-                  Score File
+                  Score File *
                 </label>
-                <Input
-                  id="file"
-                  type="file"
-                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                  className="cursor-pointer"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Supported formats: XML, MUSICXML
-                </p>
+                <Field name="file">
+                  {(field) => {
+                    const { errors, isTouched } = field.state.meta;
+                    return (
+                      <>
+                        <Input
+                          id="file"
+                          type="file"
+                          accept=".xml,.musicxml,.mxl,.pdf,.jpg,.jpeg,.png"
+                          className="cursor-pointer"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            field.handleChange(file || null);
+                            setUploadError(null);
+                          }}
+                          onBlur={() => field.handleBlur()}
+                        />
+                        {field.state.value && (
+                          <p className="text-sm text-muted-foreground">
+                            Selected: {field.state.value.name} (
+                            {(field.state.value.size / 1024 / 1024).toFixed(2)}{" "}
+                            MB)
+                          </p>
+                        )}
+                        <p className="text-xs text-muted-foreground">
+                          Supported formats: XML, MUSICXML, PDF, Images
+                        </p>
+                        {errors && errors.length > 0 && isTouched && (
+                          <span className="text-sm text-destructive">
+                            {errors[0]?.message || "Invalid input"}
+                          </span>
+                        )}
+                        {uploadError && (
+                          <p className="text-sm text-destructive">
+                            {uploadError}
+                          </p>
+                        )}
+                      </>
+                    );
+                  }}
+                </Field>
               </div>
 
               <div className="flex justify-end space-x-4 pt-4">
-                <Button type="button" variant="outline">
+                <Button type="button" variant="outline" disabled={isUploading}>
                   Cancel
                 </Button>
-                <Button type="submit">Add Score</Button>
+                <Button type="submit" disabled={isUploading}>
+                  {isUploading ? "Uploading..." : "Add Score"}
+                </Button>
               </div>
             </form>
           </CardContent>

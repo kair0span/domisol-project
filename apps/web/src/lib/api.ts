@@ -51,4 +51,19 @@ export const deleteScore = async (scoreId: string) => {
   return data;
 };
 
+export const uploadFile = async (file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
 
+  const res = await fetch(`${API_URL}/upload`, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(`Upload failed: ${errorText}`);
+  }
+
+  return res.json();
+};
