@@ -91,7 +91,7 @@ function ScoreCard({ score }: { score: ScoreResponse }) {
       <CardHeader className="space-y-4 pb-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <CardTitle className="text-xl font-bold leading-tight text-card-foreground group-hover:text-primary transition-colors duration-200 line-clamp-2 mb-3">
+            <CardTitle className="text-xl font-bold leading-tight text-card-foreground group-hover:text-primary transition-colors duration-200 line-clamp-1 mb-3">
               {title}
             </CardTitle>
             {(composer || lyricist) && (
@@ -160,7 +160,7 @@ function ScoreCard({ score }: { score: ScoreResponse }) {
             </div>
           )}
           {key && (
-            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-linear-to-br from-primary/10 to-primary/5 border border-primary/20">
               <svg
                 className="w-3.5 h-3.5 text-primary"
                 fill="currentColor"
@@ -188,7 +188,7 @@ function ScoreCard({ score }: { score: ScoreResponse }) {
 
       {description && (
         <CardContent className="pt-0 pb-4">
-          <p className="text-sm text-muted-foreground leading-relaxed line-clamp-6">
+          <p className="text-sm text-muted-foreground leading-relaxed line-clamp-1">
             {description}
           </p>
         </CardContent>

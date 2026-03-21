@@ -12,6 +12,7 @@ import {
 import { z } from "zod";
 import { addScore, uploadFile, type CreateScore } from "#/lib/api";
 import { useState } from "react";
+import { Textarea } from "#/components/ui/textarea";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -122,6 +123,7 @@ function RouteComponent() {
                             onChange={(e) => field.handleChange(e.target.value)}
                             onBlur={() => field.handleBlur()}
                             placeholder="Enter score title"
+                            className="mt-2"
                           />
                           {errors && errors.length > 0 && isTouched && (
                             <span className="text-sm text-destructive">
@@ -153,6 +155,7 @@ function RouteComponent() {
                             onChange={(e) => field.handleChange(e.target.value)}
                             onBlur={() => field.handleBlur()}
                             placeholder="Enter composer name"
+                            className="mt-2"
                           />
                           {errors && errors.length > 0 && (
                             <span className="text-sm text-destructive">
@@ -184,6 +187,7 @@ function RouteComponent() {
                             onChange={(e) => field.handleChange(e.target.value)}
                             onBlur={() => field.handleBlur()}
                             placeholder="Enter lyricist name"
+                            className="mt-2"
                           />
                           {errors && errors.length > 0 && (
                             <span className="text-sm text-destructive">
@@ -215,6 +219,7 @@ function RouteComponent() {
                             onChange={(e) => field.handleChange(e.target.value)}
                             onBlur={() => field.handleBlur()}
                             placeholder="e.g., братски, от Учителя, след 1944,"
+                            className="mt-2"
                           />
                           {errors && errors.length > 0 && (
                             <span className="text-sm text-destructive">
@@ -246,6 +251,7 @@ function RouteComponent() {
                             onChange={(e) => field.handleChange(e.target.value)}
                             onBlur={() => field.handleBlur()}
                             placeholder="e.g., C Dur, a moll"
+                            className="mt-2"
                           />
                           {errors && errors.length > 0 && (
                             <span className="text-sm text-destructive">
@@ -277,6 +283,7 @@ function RouteComponent() {
                             onChange={(e) => field.handleChange(e.target.value)}
                             onBlur={() => field.handleBlur()}
                             placeholder="e.g., vocal, instrumental"
+                            className="mt-2"
                           />
                           {errors && errors.length > 0 && (
                             <span className="text-sm text-destructive">
@@ -308,6 +315,7 @@ function RouteComponent() {
                             onChange={(e) => field.handleChange(e.target.value)}
                             onBlur={() => field.handleBlur()}
                             placeholder="Color code or name"
+                            className="mt-2"
                           />
                           {errors && errors.length > 0 && (
                             <span className="text-sm text-destructive">
@@ -339,6 +347,7 @@ function RouteComponent() {
                             onChange={(e) => field.handleChange(e.target.value)}
                             onBlur={() => field.handleBlur()}
                             placeholder="Storage location"
+                            className="mt-2"
                           />
                           {errors && errors.length > 0 && (
                             <span className="text-sm text-destructive">
@@ -369,6 +378,7 @@ function RouteComponent() {
                             value={field.state.value}
                             onChange={(e) => field.handleChange(e.target.value)}
                             onBlur={() => field.handleBlur()}
+                            className="mt-2"
                           />
                           {errors && errors.length > 0 && (
                             <span className="text-sm text-destructive">
@@ -394,13 +404,14 @@ function RouteComponent() {
                     const { errors } = field.state.meta;
                     return (
                       <>
-                        <textarea
+                        <Textarea
                           id="description"
-                          className="flex min-h-[80px] w-full rounded-4xl border border-input bg-input/30 px-3 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                          className="flex min-h-[80px] w-full rounded-4xl border border-input bg-input/30 px-3 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm mt-2"
                           value={field.state.value}
                           onChange={(e) => field.handleChange(e.target.value)}
                           onBlur={() => field.handleBlur()}
                           placeholder="Enter additional notes or description about this score"
+                         
                         />
                         {errors && errors.length > 0 && (
                           <span className="text-sm text-destructive">
@@ -425,9 +436,9 @@ function RouteComponent() {
                     const { errors } = field.state.meta;
                     return (
                       <>
-                        <textarea
+                        <Textarea
                           id="lyrics"
-                          className="flex min-h-[120px] w-full rounded-4xl border border-input bg-input/30 px-3 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                          className="flex min-h-[120px] w-full rounded-4xl border border-input bg-input/30 px-3 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm mt-2"
                           value={field.state.value}
                           onChange={(e) => field.handleChange(e.target.value)}
                           onBlur={() => field.handleBlur()}
@@ -460,7 +471,7 @@ function RouteComponent() {
                           id="file"
                           type="file"
                           accept=".xml,.musicxml,.mxl,.pdf,.jpg,.jpeg,.png"
-                          className="cursor-pointer"
+                          className="cursor-pointer mt-2"
                           onChange={(e) => {
                             const file = e.target.files?.[0];
                             field.handleChange(file || null);
