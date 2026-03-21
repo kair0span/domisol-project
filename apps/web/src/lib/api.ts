@@ -4,13 +4,9 @@ const API_URL = import.meta.env.VITE_API_URL;
 export type { CreateScore };
 
 export const fetchScores = async () => {
-  return new Promise<ScoreResponse[]>((resolve) => {
-    setTimeout(async () => {
-      const res = await fetch(`${API_URL}/scores/`);
-      const data = await res.json();
-      resolve(data);
-    }, 150);
-  });
+  const res = await fetch(`${API_URL}/scores/`);
+  const scores: ScoreResponse[] = await res.json();
+  return scores;
 };
 
 export const fetchScore = async (scoreId: string) => {
