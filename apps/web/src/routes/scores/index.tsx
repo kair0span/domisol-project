@@ -12,6 +12,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "#/components/ui/select";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "#/components/ui/pagination";
 
 const scoreSearchSchema = z.object({
   q: z.string().default(""),
@@ -26,6 +34,7 @@ const scoreSearchSchema = z.object({
   sort: z
     .enum(["title_asc", "title_desc", "date_asc", "date_desc", "all"])
     .default("title_asc"),
+  page: z.number().default(1),
 });
 
 type ScoreSearch = z.infer<typeof scoreSearchSchema>;
@@ -43,10 +52,13 @@ function ScoresPage() {
     q: "",
     category: "all",
     sort: "title_asc",
+    page: 1,
   };
 
   const scores = Route.useLoaderData();
-  const { q, category, sort } = Route.useSearch();
+  const { q, category, sort, page } = Route.useSearch();
+
+  const ITEMS_PER_PAGE = 9;
 
   const filteredScores = scores
     .filter((p) => {
@@ -56,7 +68,6 @@ function ScoresPage() {
 
       return matchesCategory && matchesSearch;
     })
-
     .sort((a, b) => {
       if (sort === "title_asc") {
         return a.title.localeCompare(b.title);
@@ -72,6 +83,12 @@ function ScoresPage() {
       }
       return 0;
     });
+
+  const totalPages = Math.ceil(filteredScores.length / ITEMS_PER_PAGE);
+  const paginatedScores = filteredScores.slice(
+    (page - 1) * ITEMS_PER_PAGE,
+    page * ITEMS_PER_PAGE,
+  );
 
   const updateSearch = (updates: Partial<ScoreSearch>) => {
     navigate({ search: (prev) => ({ ...prev, ...updates, page: 1 }) });
@@ -116,24 +133,6 @@ function ScoresPage() {
           </div>
 
           {/* Filter Controls */}
-          <div className="flex items-center gap-2">
-            <Select
-              value={sort}
-              onValueChange={(value) =>
-                updateSearch({ sort: value as ScoreSearch["sort"] })
-              }
-            >
-              <SelectTrigger className="w-40">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="title_asc">Заглавие (А-Я)</SelectItem>
-                <SelectItem value="title_desc">Заглавие (Я-А)</SelectItem>
-                <SelectItem value="date_asc">Дата (стари)</SelectItem>
-                <SelectItem value="date_desc">Дата (нови)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
 
           <div className="flex items-center gap-2">
             <Select
@@ -153,12 +152,87 @@ function ScoresPage() {
               </SelectContent>
             </Select>
           </div>
+          <div className="flex items-center gap-2">
+            <Select
+              value={sort}
+              onValueChange={(value) =>
+                updateSearch({ sort: value as ScoreSearch["sort"] })
+              }
+            >
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="title_asc">Заглавие (А-Я)</SelectItem>
+                <SelectItem value="title_desc">Заглавие (Я-А)</SelectItem>
+                <SelectItem value="date_asc">Дата (стари)</SelectItem>
+                <SelectItem value="date_desc">Дата (нови)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-          {filteredScores.map((score) => (
+          {paginatedScores.map((score) => (
             <ScoreCard key={score.id} score={score} />
           ))}
         </div>
+
+        {totalPages > 1 && (
+          <div className="mt-8 flex justify-center">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <Link
+                    to="/scores"
+                    search={(prev) => ({
+                      ...prev,
+                      page: Math.max(1, page - 1),
+                    })}
+                  >
+                    <PaginationPrevious
+                      className={
+                        page <= 1 ? "pointer-events-none opacity-50" : ""
+                      }
+                    />
+                  </Link>
+                </PaginationItem>
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (pageNum) => (
+                    <PaginationItem key={pageNum}>
+                      <Link
+                        to="/scores"
+                        search={(prev) => ({ ...prev, page: pageNum })}
+                      >
+                        <PaginationLink isActive={pageNum === page}>
+                          {pageNum}
+                        </PaginationLink>
+                      </Link>
+                    </PaginationItem>
+                  ),
+                )}
+
+                <PaginationItem>
+                  <Link
+                    to="/scores"
+                    search={(prev) => ({
+                      ...prev,
+                      page: Math.min(totalPages, page + 1),
+                    })}
+                  >
+                    <PaginationNext
+                      className={
+                        page >= totalPages
+                          ? "pointer-events-none opacity-50"
+                          : ""
+                      }
+                    />
+                  </Link>
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
       </div>
     </div>
   );
