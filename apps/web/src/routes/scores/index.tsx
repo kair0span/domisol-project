@@ -1,7 +1,7 @@
 import { fetchScores } from "#/lib/api";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "#/components/ui/button";
-import { Plus, X } from "lucide-react";
+import { Plus, X, ChevronLeft, ChevronRight } from "lucide-react";
 import ScoreCard from "#/components/score-card";
 import { Input } from "#/components/ui/input";
 import z from "zod";
@@ -12,14 +12,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "#/components/ui/select";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "#/components/ui/pagination";
 
 const scoreSearchSchema = z.object({
   q: z.string().default(""),
@@ -179,9 +171,13 @@ function ScoresPage() {
 
         {totalPages > 1 && (
           <div className="mt-8 flex justify-center">
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem>
+            <nav
+              role="navigation"
+              aria-label="pagination"
+              className="mx-auto flex w-full justify-center"
+            >
+              <ul className="flex items-center gap-1">
+                <li>
                   <Link
                     to="/scores"
                     search={(prev) => ({
@@ -189,30 +185,38 @@ function ScoresPage() {
                       page: Math.max(1, page - 1),
                     })}
                   >
-                    <PaginationPrevious
-                      className={
-                        page <= 1 ? "pointer-events-none opacity-50" : ""
-                      }
-                    />
+                    <Button
+                      variant="ghost"
+                      size="default"
+                      disabled={page <= 1}
+                      className="pl-2"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                      <span className="hidden sm:block ml-2">Previous</span>
+                    </Button>
                   </Link>
-                </PaginationItem>
+                </li>
 
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map(
                   (pageNum) => (
-                    <PaginationItem key={pageNum}>
+                    <li key={pageNum}>
                       <Link
                         to="/scores"
                         search={(prev) => ({ ...prev, page: pageNum })}
                       >
-                        <PaginationLink isActive={pageNum === page}>
+                        <Button
+                          variant={pageNum === page ? "outline" : "ghost"}
+                          size="icon"
+                          className="w-9 h-9"
+                        >
                           {pageNum}
-                        </PaginationLink>
+                        </Button>
                       </Link>
-                    </PaginationItem>
+                    </li>
                   ),
                 )}
 
-                <PaginationItem>
+                <li>
                   <Link
                     to="/scores"
                     search={(prev) => ({
@@ -220,17 +224,19 @@ function ScoresPage() {
                       page: Math.min(totalPages, page + 1),
                     })}
                   >
-                    <PaginationNext
-                      className={
-                        page >= totalPages
-                          ? "pointer-events-none opacity-50"
-                          : ""
-                      }
-                    />
+                    <Button
+                      variant="ghost"
+                      size="default"
+                      disabled={page >= totalPages}
+                      className="pr-2"
+                    >
+                      <span className="hidden sm:block mr-2">Next</span>
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
                   </Link>
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
+                </li>
+              </ul>
+            </nav>
           </div>
         )}
       </div>
