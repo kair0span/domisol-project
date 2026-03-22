@@ -1,7 +1,16 @@
+import { useState } from "react";
 import { fetchScores } from "#/lib/api";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { Button } from "#/components/ui/button";
-import { Plus, X, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Plus,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  ArrowDownNarrowWide,
+  ArrowUpWideNarrow,
+  ArrowUpNarrowWide,
+} from "lucide-react";
 import ScoreCard from "#/components/score-card";
 import { Input } from "#/components/ui/input";
 import z from "zod";
@@ -12,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "#/components/ui/select";
+import { ScoreAddModal } from "#/routes/scores/score-add";
 
 const scoreSearchSchema = z.object({
   q: z.string().default(""),
@@ -39,6 +49,8 @@ export const Route = createFileRoute("/scores/")({
 
 function ScoresPage() {
   const navigate = Route.useNavigate();
+  const router = useRouter();
+  const [addOpen, setAddOpen] = useState(false);
 
   const defaultSearch: ScoreSearch = {
     q: "",
@@ -92,15 +104,22 @@ function ScoresPage() {
 
   return (
     <div className="min-h-[calc(100vh-64px)] bg-background">
+      <ScoreAddModal
+        open={addOpen}
+        onOpenChange={setAddOpen}
+        onSuccess={() => router.invalidate()}
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-8 flex items-center justify-between">
           <h1 className="text-3xl font-bold tracking-tight text-foreground mb-3">
             Music Scores
           </h1>
-          <Button asChild>
-            <Link to="/scores/score-add">
-              <Plus />
-            </Link>
+          <Button
+            type="button"
+            onClick={() => setAddOpen(true)}
+            aria-label="Add score"
+          >
+            <Plus />
           </Button>
         </div>
         <div className="mb-8 flex items-center gap-4 w-full">
@@ -133,7 +152,7 @@ function ScoresPage() {
                 updateSearch({ category: value as ScoreSearch["category"] })
               }
             >
-              <SelectTrigger className="w-40">
+              <SelectTrigger className="w-35">
                 <SelectValue placeholder="Filter by" />
               </SelectTrigger>
               <SelectContent>
@@ -151,14 +170,22 @@ function ScoresPage() {
                 updateSearch({ sort: value as ScoreSearch["sort"] })
               }
             >
-              <SelectTrigger className="w-40">
+              <SelectTrigger className="w-35">
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="title_asc">Заглавие (А-Я)</SelectItem>
-                <SelectItem value="title_desc">Заглавие (Я-А)</SelectItem>
-                <SelectItem value="date_asc">Дата (стари)</SelectItem>
-                <SelectItem value="date_desc">Дата (нови)</SelectItem>
+                <SelectItem value="title_asc">
+                  Заглавие <ArrowDownNarrowWide />
+                </SelectItem>
+                <SelectItem value="title_desc">
+                  Заглавие <ArrowUpWideNarrow />
+                </SelectItem>
+                <SelectItem value="date_asc">
+                  Дата <ArrowDownNarrowWide />
+                </SelectItem>
+                <SelectItem value="date_desc">
+                  Дата <ArrowUpNarrowWide />
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>

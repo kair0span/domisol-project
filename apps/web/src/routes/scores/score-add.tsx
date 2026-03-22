@@ -1,18 +1,22 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { useForm } from "@tanstack/react-form";
+import { useEffect, useState } from "react";
+import { z } from "zod";
+import { Music2 } from "lucide-react";
 import { Button } from "#/components/ui/button";
 import { Input } from "#/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "#/components/ui/card";
-import { z } from "zod";
-import { addScore, uploadFile, type CreateScore } from "#/lib/api";
-import { useState } from "react";
 import { Textarea } from "#/components/ui/textarea";
+import { Separator } from "#/components/ui/separator";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "#/components/ui/dialog";
+import { cn } from "#/lib/utils";
+import { addScore, uploadFile, type CreateScore } from "#/lib/api";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -30,15 +34,95 @@ const formSchema = z.object({
   file: z.any().refine((file) => file, "Score file is required"),
 });
 
-export const Route = createFileRoute("/scores/score-add")({
-  component: RouteComponent,
-});
+const labelClass =
+  "text-sm font-medium leading-none text-foreground peer-disabled:cursor-not-allowed peer-disabled:opacity-70";
 
-function RouteComponent() {
-  const router = useRouter();
+/** Flex + gap is reliable; margin-based space-y can collapse next to some controls */
+const fieldGroupClass = "flex flex-col gap-2";
+const labelToControlClass = "flex flex-col gap-4";
+
+export type ScoreAddModalProps = {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void | Promise<void>;
+};
+
+export function ScoreAddModal({
+  open,
+  onOpenChange,
+  onSuccess,
+}: ScoreAddModalProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [formKey, setFormKey] = useState(0);
 
+  useEffect(() => {
+    if (open) {
+      setUploadError(null);
+      setFormKey((k) => k + 1);
+    }
+  }, [open]);
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent
+        showCloseButton
+        className={cn(
+          "flex max-h-[min(92vh,880px)] w-full max-w-3xl flex-col gap-0 overflow-hidden p-0 sm:max-w-3xl",
+          "[&>form]:flex [&>form]:min-h-0 [&>form]:flex-1 [&>form]:flex-col",
+        )}
+      >
+        <div className="shrink-0 border-b border-border/80 bg-muted/30 px-5 py-4 sm:px-6">
+          <DialogHeader className="gap-3 text-left sm:flex-row sm:items-start sm:gap-4">
+            <div
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary"
+              aria-hidden
+            >
+              <Music2 className="h-5 w-5" />
+            </div>
+            <div className="min-w-0 flex-1 space-y-1.5">
+              <DialogTitle className="text-lg font-semibold tracking-tight sm:text-xl">
+                Add new score
+              </DialogTitle>
+              <DialogDescription className="text-sm leading-relaxed">
+                Add a score to your collection: metadata, lyrics, and an
+                optional file (MusicXML, MXL).
+              </DialogDescription>
+            </div>
+          </DialogHeader>
+        </div>
+
+        <ScoreAddForm
+          key={formKey}
+          isUploading={isUploading}
+          setIsUploading={setIsUploading}
+          uploadError={uploadError}
+          setUploadError={setUploadError}
+          onSuccess={onSuccess}
+          onClose={() => onOpenChange(false)}
+        />
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+type ScoreAddFormProps = {
+  isUploading: boolean;
+  setIsUploading: (v: boolean) => void;
+  uploadError: string | null;
+  setUploadError: (v: string | null) => void;
+  onSuccess?: () => void | Promise<void>;
+  onClose: () => void;
+};
+
+function ScoreAddForm({
+  isUploading,
+  setIsUploading,
+  uploadError,
+  setUploadError,
+  onSuccess,
+  onClose,
+}: ScoreAddFormProps) {
   const { Field, handleSubmit } = useForm({
     defaultValues: {
       title: "",
@@ -52,7 +136,7 @@ function RouteComponent() {
       description: "",
       date: "",
       lyrics: "",
-      userId: "df63f948-1b5d-4f57-abf8-dea6f0d54307", // TODO: Get actual user ID from auth
+      userId: "df63f948-1b5d-4f57-abf8-dea6f0d54307",
       file: null,
     } as CreateScore & { file: File | null },
     onSubmit: async ({ value }) => {
@@ -60,15 +144,14 @@ function RouteComponent() {
         setIsUploading(true);
         setUploadError(null);
 
-        // Upload file if selected
         if (value.file) {
           await uploadFile(value.file);
         }
 
-        // Create score record (excluding file from the score data)
         const { file: _, ...scoreData } = value;
         await addScore(scoreData as CreateScore);
-        router.navigate({ to: "/scores" });
+        await onSuccess?.();
+        onClose();
       } catch (error) {
         console.error("Failed to add score:", error);
         setUploadError(
@@ -85,438 +168,443 @@ function RouteComponent() {
   });
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <Card>
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold">Add New Score</CardTitle>
-            <CardDescription>
-              Enter the details for the new musical score you want to add to
-              your collection.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleSubmit();
-              }}
-              className="space-y-6"
-            >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label
-                    htmlFor="title"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        handleSubmit();
+      }}
+      className="flex min-h-0 flex-1 flex-col"
+    >
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-5 sm:px-6">
+        <div className="space-y-8">
+          <section className="space-y-4" aria-labelledby="score-section-basic">
+            <div className="space-y-1">
+              <h3
+                id="score-section-basic"
+                className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+              >
+                Basic information
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Title and people behind the piece.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
+              <Field name="title">
+                {(field) => (
+                  <div className={fieldGroupClass}>
+                    <div className={labelToControlClass}>
+                      <label htmlFor="score-title" className={labelClass}>
+                        Title <span className="text-destructive">*</span>
+                      </label>
+                      <Input
+                        id="score-title"
+                        type="text"
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        onBlur={() => field.handleBlur()}
+                        placeholder="Score title"
+                        autoComplete="off"
+                        aria-invalid={
+                          !!field.state.meta.errors?.length &&
+                          field.state.meta.isTouched
+                        }
+                      />
+                    </div>
+                    <FieldError field={field} requireTouched />
+                  </div>
+                )}
+              </Field>
+
+              <Field name="composer">
+                {(field) => (
+                  <div className={fieldGroupClass}>
+                    <div className={labelToControlClass}>
+                      <label htmlFor="score-composer" className={labelClass}>
+                        Composer <span className="text-destructive">*</span>
+                      </label>
+                      <Input
+                        id="score-composer"
+                        type="text"
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        onBlur={() => field.handleBlur()}
+                        placeholder="Composer name"
+                        autoComplete="off"
+                      />
+                    </div>
+                    <FieldError field={field} />
+                  </div>
+                )}
+              </Field>
+
+              <Field name="lyricist">
+                {(field) => (
+                  <div
+                    className={cn(fieldGroupClass, "sm:col-span-2")}
                   >
-                    Title *
-                  </label>
-                  <Field name="title">
-                    {(field) => {
-                      const { errors, isTouched } = field.state.meta;
-                      return (
-                        <>
-                          <Input
-                            id="title"
-                            type="text"
-                            value={field.state.value}
-                            onChange={(e) => field.handleChange(e.target.value)}
-                            onBlur={() => field.handleBlur()}
-                            placeholder="Enter score title"
-                            className="mt-2"
-                          />
-                          {errors && errors.length > 0 && isTouched && (
-                            <span className="text-sm text-destructive">
-                              {errors[0]?.message || "Invalid input"}
-                            </span>
-                          )}
-                        </>
-                      );
-                    }}
-                  </Field>
+                    <div className={labelToControlClass}>
+                      <label htmlFor="score-lyricist" className={labelClass}>
+                        Lyricist <span className="text-destructive">*</span>
+                      </label>
+                      <Input
+                        id="score-lyricist"
+                        type="text"
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        onBlur={() => field.handleBlur()}
+                        placeholder="Lyricist name"
+                        autoComplete="off"
+                      />
+                    </div>
+                    <FieldError field={field} />
+                  </div>
+                )}
+              </Field>
+            </div>
+          </section>
+
+          <Separator className="bg-border/60" />
+
+          <section
+            className="space-y-4"
+            aria-labelledby="score-section-classification"
+          >
+            <div className="space-y-1">
+              <h3
+                id="score-section-classification"
+                className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+              >
+                Classification &amp; storage
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                How the score is categorized and where it lives.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
+              <Field name="category">
+                {(field) => (
+                  <div className={fieldGroupClass}>
+                    <div className={labelToControlClass}>
+                      <label htmlFor="score-category" className={labelClass}>
+                        Category <span className="text-destructive">*</span>
+                      </label>
+                      <Input
+                        id="score-category"
+                        type="text"
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        onBlur={() => field.handleBlur()}
+                        placeholder="e.g. братски, от Учителя, след 1944"
+                        autoComplete="off"
+                      />
+                    </div>
+                    <FieldError field={field} />
+                  </div>
+                )}
+              </Field>
+
+              <Field name="genre">
+                {(field) => (
+                  <div className={fieldGroupClass}>
+                    <div className={labelToControlClass}>
+                      <label htmlFor="score-genre" className={labelClass}>
+                        Genre <span className="text-destructive">*</span>
+                      </label>
+                      <Input
+                        id="score-genre"
+                        type="text"
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        onBlur={() => field.handleBlur()}
+                        placeholder="e.g. vocal, instrumental"
+                        autoComplete="off"
+                      />
+                    </div>
+                    <FieldError field={field} />
+                  </div>
+                )}
+              </Field>
+
+              <Field name="key">
+                {(field) => (
+                  <div className={fieldGroupClass}>
+                    <div className={labelToControlClass}>
+                      <label htmlFor="score-key" className={labelClass}>
+                        Key <span className="text-destructive">*</span>
+                      </label>
+                      <Input
+                        id="score-key"
+                        type="text"
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        onBlur={() => field.handleBlur()}
+                        placeholder="e.g. C major, A minor"
+                        autoComplete="off"
+                      />
+                    </div>
+                    <FieldError field={field} />
+                  </div>
+                )}
+              </Field>
+
+              <Field name="color">
+                {(field) => (
+                  <div className={fieldGroupClass}>
+                    <div className={labelToControlClass}>
+                      <label htmlFor="score-color" className={labelClass}>
+                        Color <span className="text-destructive">*</span>
+                      </label>
+                      <Input
+                        id="score-color"
+                        type="text"
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        onBlur={() => field.handleBlur()}
+                        placeholder="Color code or name"
+                        autoComplete="off"
+                      />
+                    </div>
+                    <FieldError field={field} />
+                  </div>
+                )}
+              </Field>
+
+              <Field name="location">
+                {(field) => (
+                  <div className={fieldGroupClass}>
+                    <div className={labelToControlClass}>
+                      <label htmlFor="score-location" className={labelClass}>
+                        Location <span className="text-destructive">*</span>
+                      </label>
+                      <Input
+                        id="score-location"
+                        type="text"
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        onBlur={() => field.handleBlur()}
+                        placeholder="Physical or logical storage"
+                        autoComplete="off"
+                      />
+                    </div>
+                    <FieldError field={field} />
+                  </div>
+                )}
+              </Field>
+
+              <Field name="date">
+                {(field) => (
+                  <div className={fieldGroupClass}>
+                    <div className={labelToControlClass}>
+                      <label htmlFor="score-date" className={labelClass}>
+                        Date <span className="text-destructive">*</span>
+                      </label>
+                      <Input
+                        id="score-date"
+                        type="date"
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        onBlur={() => field.handleBlur()}
+                      />
+                    </div>
+                    <FieldError field={field} />
+                  </div>
+                )}
+              </Field>
+            </div>
+          </section>
+
+          <Separator className="bg-border/60" />
+
+          <section className="space-y-4" aria-labelledby="score-section-content">
+            <div className="space-y-1">
+              <h3
+                id="score-section-content"
+                className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+              >
+                Text &amp; notes
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Description and full lyrics.
+              </p>
+            </div>
+
+            <Field name="description">
+              {(field) => (
+                <div className={fieldGroupClass}>
+                  <div className={labelToControlClass}>
+                    <label htmlFor="score-description" className={labelClass}>
+                      Description <span className="text-destructive">*</span>
+                    </label>
+                    <Textarea
+                      id="score-description"
+                      className="min-h-[88px] resize-y rounded-2xl border border-input bg-input/30 px-3 py-2.5 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 md:text-sm"
+                      value={field.state.value}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      onBlur={() => field.handleBlur()}
+                      placeholder="Notes about this score"
+                    />
+                  </div>
+                  <FieldError field={field} />
                 </div>
+              )}
+            </Field>
 
-                <div className="space-y-2">
-                  <label
-                    htmlFor="composer"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Composer *
-                  </label>
-                  <Field name="composer">
-                    {(field) => {
-                      const { errors } = field.state.meta;
-                      return (
-                        <>
-                          <Input
-                            id="composer"
-                            type="text"
-                            value={field.state.value}
-                            onChange={(e) => field.handleChange(e.target.value)}
-                            onBlur={() => field.handleBlur()}
-                            placeholder="Enter composer name"
-                            className="mt-2"
-                          />
-                          {errors && errors.length > 0 && (
-                            <span className="text-sm text-destructive">
-                              {errors[0]?.message || "Invalid input"}
-                            </span>
-                          )}
-                        </>
-                      );
-                    }}
-                  </Field>
+            <Field name="lyrics">
+              {(field) => (
+                <div className={fieldGroupClass}>
+                  <div className={labelToControlClass}>
+                    <label htmlFor="score-lyrics" className={labelClass}>
+                      Lyrics <span className="text-destructive">*</span>
+                    </label>
+                    <Textarea
+                      id="score-lyrics"
+                      className="min-h-[140px] resize-y rounded-2xl border border-input bg-input/30 px-3 py-2.5 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 md:text-sm"
+                      value={field.state.value}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      onBlur={() => field.handleBlur()}
+                      placeholder="Full lyrics"
+                    />
+                  </div>
+                  <FieldError field={field} />
                 </div>
+              )}
+            </Field>
+          </section>
 
-                <div className="space-y-2">
-                  <label
-                    htmlFor="lyricist"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Lyricist
-                  </label>
-                  <Field name="lyricist">
-                    {(field) => {
-                      const { errors } = field.state.meta;
-                      return (
-                        <>
-                          <Input
-                            id="lyricist"
-                            type="text"
-                            value={field.state.value}
-                            onChange={(e) => field.handleChange(e.target.value)}
-                            onBlur={() => field.handleBlur()}
-                            placeholder="Enter lyricist name"
-                            className="mt-2"
-                          />
-                          {errors && errors.length > 0 && (
-                            <span className="text-sm text-destructive">
-                              {errors[0]?.message || "Invalid input"}
-                            </span>
-                          )}
-                        </>
-                      );
-                    }}
-                  </Field>
+          <Separator className="bg-border/60" />
+
+          <section className="space-y-4" aria-labelledby="score-section-file">
+            <div className="space-y-1">
+              <h3
+                id="score-section-file"
+                className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+              >
+                Score file
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Upload MusicXML, PDF, or an image (required).
+              </p>
+            </div>
+
+            <Field name="file">
+              {(field) => (
+                <div className={fieldGroupClass}>
+                  <div className={labelToControlClass}>
+                    <label htmlFor="score-file" className={labelClass}>
+                      File <span className="text-destructive">*</span>
+                    </label>
+                    <div
+                      className={cn(
+                        "rounded-2xl border border-dashed border-input bg-muted/20 px-4 py-4 transition-colors",
+                        "hover:bg-muted/30 focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/30",
+                      )}
+                    >
+                      <Input
+                        id="score-file"
+                        type="file"
+                        accept=".xml,.musicxml,.mxl,.pdf,.jpg,.jpeg,.png"
+                        className="cursor-pointer border-0 bg-transparent p-0 file:mr-4 file:rounded-lg file:border-0 file:bg-primary/10 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-primary hover:file:bg-primary/15"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          field.handleChange(file || null);
+                          setUploadError(null);
+                        }}
+                        onBlur={() => field.handleBlur()}
+                      />
+                    </div>
+                  </div>
+                  {field.state.value && (
+                    <p className="text-sm text-muted-foreground">
+                      Selected: {field.state.value.name} (
+                      {(field.state.value.size / 1024 / 1024).toFixed(2)} MB)
+                    </p>
+                  )}
+                  <p className="text-xs text-muted-foreground">
+                    Supported: XML, MusicXML, MXL, PDF, JPG, PNG
+                  </p>
+                  <FieldError field={field} requireTouched />
+                  {uploadError && (
+                    <p className="text-sm text-destructive" role="alert">
+                      {uploadError}
+                    </p>
+                  )}
                 </div>
-
-                <div className="space-y-2">
-                  <label
-                    htmlFor="category"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Category
-                  </label>
-                  <Field name="category">
-                    {(field) => {
-                      const { errors } = field.state.meta;
-                      return (
-                        <>
-                          <Input
-                            id="category"
-                            type="text"
-                            value={field.state.value}
-                            onChange={(e) => field.handleChange(e.target.value)}
-                            onBlur={() => field.handleBlur()}
-                            placeholder="e.g., братски, от Учителя, след 1944,"
-                            className="mt-2"
-                          />
-                          {errors && errors.length > 0 && (
-                            <span className="text-sm text-destructive">
-                              {errors[0]?.message || "Invalid input"}
-                            </span>
-                          )}
-                        </>
-                      );
-                    }}
-                  </Field>
-                </div>
-
-                <div className="space-y-2">
-                  <label
-                    htmlFor="key"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Key
-                  </label>
-                  <Field name="key">
-                    {(field) => {
-                      const { errors } = field.state.meta;
-                      return (
-                        <>
-                          <Input
-                            id="key"
-                            type="text"
-                            value={field.state.value}
-                            onChange={(e) => field.handleChange(e.target.value)}
-                            onBlur={() => field.handleBlur()}
-                            placeholder="e.g., C Dur, a moll"
-                            className="mt-2"
-                          />
-                          {errors && errors.length > 0 && (
-                            <span className="text-sm text-destructive">
-                              {errors[0]?.message || "Invalid input"}
-                            </span>
-                          )}
-                        </>
-                      );
-                    }}
-                  </Field>
-                </div>
-
-                <div className="space-y-2">
-                  <label
-                    htmlFor="genre"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Genre
-                  </label>
-                  <Field name="genre">
-                    {(field) => {
-                      const { errors } = field.state.meta;
-                      return (
-                        <>
-                          <Input
-                            id="genre"
-                            type="text"
-                            value={field.state.value}
-                            onChange={(e) => field.handleChange(e.target.value)}
-                            onBlur={() => field.handleBlur()}
-                            placeholder="e.g., vocal, instrumental"
-                            className="mt-2"
-                          />
-                          {errors && errors.length > 0 && (
-                            <span className="text-sm text-destructive">
-                              {errors[0]?.message || "Invalid input"}
-                            </span>
-                          )}
-                        </>
-                      );
-                    }}
-                  </Field>
-                </div>
-
-                <div className="space-y-2">
-                  <label
-                    htmlFor="color"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Color
-                  </label>
-                  <Field name="color">
-                    {(field) => {
-                      const { errors } = field.state.meta;
-                      return (
-                        <>
-                          <Input
-                            id="color"
-                            type="text"
-                            value={field.state.value}
-                            onChange={(e) => field.handleChange(e.target.value)}
-                            onBlur={() => field.handleBlur()}
-                            placeholder="Color code or name"
-                            className="mt-2"
-                          />
-                          {errors && errors.length > 0 && (
-                            <span className="text-sm text-destructive">
-                              {errors[0]?.message || "Invalid input"}
-                            </span>
-                          )}
-                        </>
-                      );
-                    }}
-                  </Field>
-                </div>
-
-                <div className="space-y-2">
-                  <label
-                    htmlFor="location"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Location
-                  </label>
-                  <Field name="location">
-                    {(field) => {
-                      const { errors } = field.state.meta;
-                      return (
-                        <>
-                          <Input
-                            id="location"
-                            type="text"
-                            value={field.state.value}
-                            onChange={(e) => field.handleChange(e.target.value)}
-                            onBlur={() => field.handleBlur()}
-                            placeholder="Storage location"
-                            className="mt-2"
-                          />
-                          {errors && errors.length > 0 && (
-                            <span className="text-sm text-destructive">
-                              {errors[0]?.message || "Invalid input"}
-                            </span>
-                          )}
-                        </>
-                      );
-                    }}
-                  </Field>
-                </div>
-
-                <div className="space-y-2">
-                  <label
-                    htmlFor="date"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Date
-                  </label>
-                  <Field name="date">
-                    {(field) => {
-                      const { errors } = field.state.meta;
-                      return (
-                        <>
-                          <Input
-                            id="date"
-                            type="date"
-                            value={field.state.value}
-                            onChange={(e) => field.handleChange(e.target.value)}
-                            onBlur={() => field.handleBlur()}
-                            className="mt-2"
-                          />
-                          {errors && errors.length > 0 && (
-                            <span className="text-sm text-destructive">
-                              {errors[0]?.message || "Invalid input"}
-                            </span>
-                          )}
-                        </>
-                      );
-                    }}
-                  </Field>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label
-                  htmlFor="description"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  Description
-                </label>
-                <Field name="description">
-                  {(field) => {
-                    const { errors } = field.state.meta;
-                    return (
-                      <>
-                        <Textarea
-                          id="description"
-                          className="flex min-h-[80px] w-full rounded-4xl border border-input bg-input/30 px-3 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm mt-2"
-                          value={field.state.value}
-                          onChange={(e) => field.handleChange(e.target.value)}
-                          onBlur={() => field.handleBlur()}
-                          placeholder="Enter additional notes or description about this score"
-                         
-                        />
-                        {errors && errors.length > 0 && (
-                          <span className="text-sm text-destructive">
-                            {errors[0]?.message || "Invalid input"}
-                          </span>
-                        )}
-                      </>
-                    );
-                  }}
-                </Field>
-              </div>
-
-              <div className="space-y-2">
-                <label
-                  htmlFor="lyrics"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  Lyrics *
-                </label>
-                <Field name="lyrics">
-                  {(field) => {
-                    const { errors } = field.state.meta;
-                    return (
-                      <>
-                        <Textarea
-                          id="lyrics"
-                          className="flex min-h-[120px] w-full rounded-4xl border border-input bg-input/30 px-3 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm mt-2"
-                          value={field.state.value}
-                          onChange={(e) => field.handleChange(e.target.value)}
-                          onBlur={() => field.handleBlur()}
-                          placeholder="Enter the lyrics for this score"
-                        />
-                        {errors && errors.length > 0 && (
-                          <span className="text-sm text-destructive">
-                            {errors[0]?.message || "Invalid input"}
-                          </span>
-                        )}
-                      </>
-                    );
-                  }}
-                </Field>
-              </div>
-
-              <div className="space-y-2">
-                <label
-                  htmlFor="file"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  Score File *
-                </label>
-                <Field name="file">
-                  {(field) => {
-                    const { errors, isTouched } = field.state.meta;
-                    return (
-                      <>
-                        <Input
-                          id="file"
-                          type="file"
-                          accept=".xml,.musicxml,.mxl,.pdf,.jpg,.jpeg,.png"
-                          className="cursor-pointer mt-2"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            field.handleChange(file || null);
-                            setUploadError(null);
-                          }}
-                          onBlur={() => field.handleBlur()}
-                        />
-                        {field.state.value && (
-                          <p className="text-sm text-muted-foreground">
-                            Selected: {field.state.value.name} (
-                            {(field.state.value.size / 1024 / 1024).toFixed(2)}{" "}
-                            MB)
-                          </p>
-                        )}
-                        <p className="text-xs text-muted-foreground">
-                          Supported formats: XML, MUSICXML, PDF, Images
-                        </p>
-                        {errors && errors.length > 0 && isTouched && (
-                          <span className="text-sm text-destructive">
-                            {errors[0]?.message || "Invalid input"}
-                          </span>
-                        )}
-                        {uploadError && (
-                          <p className="text-sm text-destructive">
-                            {uploadError}
-                          </p>
-                        )}
-                      </>
-                    );
-                  }}
-                </Field>
-              </div>
-
-              <div className="flex justify-end space-x-4 pt-4">
-                <Button type="button" variant="outline" disabled={isUploading}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isUploading}>
-                  {isUploading ? "Uploading..." : "Add Score"}
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
+              )}
+            </Field>
+          </section>
+        </div>
       </div>
-    </div>
+
+      <DialogFooter className="shrink-0 gap-2 border-t border-border/80 bg-background/95 px-5 py-4 backdrop-blur-sm sm:flex-row sm:justify-end sm:px-6">
+        <Button
+          type="button"
+          variant="outline"
+          disabled={isUploading}
+          onClick={onClose}
+          className="w-full sm:w-auto"
+        >
+          Cancel
+        </Button>
+        <Button
+          type="submit"
+          disabled={isUploading}
+          className="w-full sm:w-auto"
+        >
+          {isUploading ? "Saving…" : "Add score"}
+        </Button>
+      </DialogFooter>
+    </form>
+  );
+}
+
+function fieldFirstMessage(errors: unknown): string | undefined {
+  if (!Array.isArray(errors) || errors.length === 0) return undefined;
+  const first = errors[0];
+  if (first && typeof first === "object" && "message" in first) {
+    const m = (first as { message?: unknown }).message;
+    return typeof m === "string" ? m : undefined;
+  }
+  return undefined;
+}
+
+function FieldError({
+  field,
+  requireTouched,
+}: {
+  field: {
+    state: {
+      meta: { errors?: unknown; isTouched?: boolean };
+    };
+  };
+  requireTouched?: boolean;
+}) {
+  const { errors, isTouched } = field.state.meta;
+  const msg = fieldFirstMessage(errors);
+  if (!msg) return null;
+  if (requireTouched && !isTouched) return null;
+  return <span className="text-sm text-destructive">{msg}</span>;
+}
+
+export const Route = createFileRoute("/scores/score-add")({
+  component: ScoreAddRoute,
+});
+
+function ScoreAddRoute() {
+  const navigate = useNavigate();
+  const router = useRouter();
+  const [open, setOpen] = useState(true);
+
+  return (
+    <ScoreAddModal
+      open={open}
+      onOpenChange={(next) => {
+        setOpen(next);
+        if (!next) {
+          navigate({ to: "/scores" });
+        }
+      }}
+      onSuccess={() => router.invalidate()}
+    />
   );
 }
