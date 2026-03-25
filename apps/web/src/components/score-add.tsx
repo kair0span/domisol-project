@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
+import { useNavigate, useRouter } from "@tanstack/react-router";
 import { useForm } from "@tanstack/react-form";
 import { useEffect, useState } from "react";
 import { z } from "zod";
@@ -586,11 +586,7 @@ function FieldError({
   return <span className="text-sm text-destructive">{msg}</span>;
 }
 
-export const Route = createFileRoute("/scores/score-add")({
-  component: ScoreAddRoute,
-});
-
-function ScoreAddRoute() {
+export function ScoreAddRoute() {
   const navigate = useNavigate();
   const router = useRouter();
   const [open, setOpen] = useState(true);

@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ScoresIndexRouteImport } from './routes/scores/index'
-import { Route as ScoresScoreAddRouteImport } from './routes/scores/score-add'
 import { Route as ScoresScoreIdRouteImport } from './routes/scores/$scoreId'
 import { Route as AuthSingupIndexRouteImport } from './routes/auth/singup/index'
 import { Route as AuthLoginIndexRouteImport } from './routes/auth/login/index'
@@ -30,11 +29,6 @@ const IndexRoute = IndexRouteImport.update({
 const ScoresIndexRoute = ScoresIndexRouteImport.update({
   id: '/scores/',
   path: '/scores/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ScoresScoreAddRoute = ScoresScoreAddRouteImport.update({
-  id: '/scores/score-add',
-  path: '/scores/score-add',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ScoresScoreIdRoute = ScoresScoreIdRouteImport.update({
@@ -57,7 +51,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/scores/$scoreId': typeof ScoresScoreIdRoute
-  '/scores/score-add': typeof ScoresScoreAddRoute
   '/scores/': typeof ScoresIndexRoute
   '/auth/login/': typeof AuthLoginIndexRoute
   '/auth/singup/': typeof AuthSingupIndexRoute
@@ -66,7 +59,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/scores/$scoreId': typeof ScoresScoreIdRoute
-  '/scores/score-add': typeof ScoresScoreAddRoute
   '/scores': typeof ScoresIndexRoute
   '/auth/login': typeof AuthLoginIndexRoute
   '/auth/singup': typeof AuthSingupIndexRoute
@@ -76,7 +68,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/scores/$scoreId': typeof ScoresScoreIdRoute
-  '/scores/score-add': typeof ScoresScoreAddRoute
   '/scores/': typeof ScoresIndexRoute
   '/auth/login/': typeof AuthLoginIndexRoute
   '/auth/singup/': typeof AuthSingupIndexRoute
@@ -87,7 +78,6 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/scores/$scoreId'
-    | '/scores/score-add'
     | '/scores/'
     | '/auth/login/'
     | '/auth/singup/'
@@ -96,7 +86,6 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/scores/$scoreId'
-    | '/scores/score-add'
     | '/scores'
     | '/auth/login'
     | '/auth/singup'
@@ -105,7 +94,6 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/scores/$scoreId'
-    | '/scores/score-add'
     | '/scores/'
     | '/auth/login/'
     | '/auth/singup/'
@@ -115,7 +103,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   ScoresScoreIdRoute: typeof ScoresScoreIdRoute
-  ScoresScoreAddRoute: typeof ScoresScoreAddRoute
   ScoresIndexRoute: typeof ScoresIndexRoute
   AuthLoginIndexRoute: typeof AuthLoginIndexRoute
   AuthSingupIndexRoute: typeof AuthSingupIndexRoute
@@ -142,13 +129,6 @@ declare module '@tanstack/react-router' {
       path: '/scores'
       fullPath: '/scores/'
       preLoaderRoute: typeof ScoresIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/scores/score-add': {
-      id: '/scores/score-add'
-      path: '/scores/score-add'
-      fullPath: '/scores/score-add'
-      preLoaderRoute: typeof ScoresScoreAddRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/scores/$scoreId': {
@@ -179,7 +159,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   ScoresScoreIdRoute: ScoresScoreIdRoute,
-  ScoresScoreAddRoute: ScoresScoreAddRoute,
   ScoresIndexRoute: ScoresIndexRoute,
   AuthLoginIndexRoute: AuthLoginIndexRoute,
   AuthSingupIndexRoute: AuthSingupIndexRoute,

@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "#/components/ui/select";
-import { ScoreAddModal } from "#/routes/scores/score-add";
+import { ScoreAddModal } from "#/components/score-add";
 
 const scoreSearchSchema = z.object({
   q: z.string().default(""),
