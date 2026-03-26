@@ -33,6 +33,18 @@ const scoreSearchSchema = z.object({
       z.literal("след 1944"),
     ])
     .default("all"),
+  color: z
+    .union([
+      z.literal("all"),
+      z.literal("red"),
+      z.literal("orange"),
+      z.literal("yellow"),
+      z.literal("green"),
+      z.literal("blue"),
+      z.literal("darkblue"),
+      z.literal("purple"),
+    ])
+    .default("all"),
   sort: z
     .enum(["title_asc", "title_desc", "date_asc", "date_desc", "all"])
     .default("title_asc"),
@@ -55,22 +67,24 @@ function ScoresPage() {
   const defaultSearch: ScoreSearch = {
     q: "",
     category: "all",
+    color: "all",
     sort: "title_asc",
     page: 1,
   };
 
   const scores = Route.useLoaderData();
-  const { q, category, sort, page } = Route.useSearch();
+  const { q, category, color, sort, page } = Route.useSearch();
 
   const ITEMS_PER_PAGE = 9;
 
   const filteredScores = scores
     .filter((p) => {
       const matchesCategory = category === "all" || p.category === category;
+      const matchesColor = color === "all" || p.color === color;
       const matchesSearch =
         q === "" || p.title.toLowerCase().includes(q.toLowerCase());
 
-      return matchesCategory && matchesSearch;
+      return matchesCategory && matchesColor && matchesSearch;
     })
     .sort((a, b) => {
       if (sort === "title_asc") {
@@ -131,7 +145,10 @@ function ScoresPage() {
               value={q}
               onChange={(e) => updateSearch({ q: e.target.value })}
             />
-            {(q || category !== "all" || sort !== "title_asc") && (
+            {(q ||
+              color !== "all") && (
+              category !== "all" ||
+              sort !== "title_asc" ||
               <Button
                 variant="ghost"
                 size="sm"
@@ -156,10 +173,32 @@ function ScoresPage() {
                 <SelectValue placeholder="Filter by" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Всички</SelectItem>
+                <SelectItem value="all">По категории</SelectItem>
                 <SelectItem value="братски">Братски</SelectItem>
                 <SelectItem value="от Учителя">От Учителя</SelectItem>
                 <SelectItem value="след 1944">След 1944</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center gap-2">
+            <Select
+              value={color}
+              onValueChange={(value) =>
+                updateSearch({ color: value as ScoreSearch["color"] })
+              }
+            >
+              <SelectTrigger className="w-35">
+                <SelectValue placeholder="Filter by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">По цветове</SelectItem>
+                <SelectItem value="red">Червен</SelectItem>
+                <SelectItem value="orange">Оранжев</SelectItem>
+                <SelectItem value="yellow">Жълт</SelectItem>
+                <SelectItem value="green">Зелен</SelectItem>
+                <SelectItem value="blue">Син</SelectItem>
+                <SelectItem value="darkblue">Тъмносин</SelectItem>
+                <SelectItem value="purple">Виолетов</SelectItem>
               </SelectContent>
             </Select>
           </div>
