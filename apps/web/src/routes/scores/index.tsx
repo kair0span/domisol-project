@@ -141,7 +141,7 @@ function ScoresPage() {
           <div className="relative flex-1">
             <Input
               className="w-full"
-              placeholder="Search scores by title..."
+              placeholder="Търсене ..."
               value={q}
               onChange={(e) => updateSearch({ q: e.target.value })}
             />
