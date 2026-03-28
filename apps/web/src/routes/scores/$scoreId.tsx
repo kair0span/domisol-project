@@ -1,7 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "#/components/ui/tabs";
 import { fetchScore } from "#/lib/api";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, CirclePlay, FileText, Info, ListMusic } from "lucide-react";
+import { createFileRoute } from "@tanstack/react-router";
+import { CirclePlay, FileText, Info, ListMusic } from "lucide-react";
 
 export const Route = createFileRoute("/scores/$scoreId")({
   component: ScorePage,
@@ -10,7 +10,7 @@ export const Route = createFileRoute("/scores/$scoreId")({
 
 function ScorePage() {
   const score = Route.useLoaderData();
-  const { title, lyrics, description, composer } = score;
+  const { title, lyrics, description } = score;
 
   return (
     <div className="mx-auto flex h-full max-w-7xl p-3 gap-6 px-4 sm:px-6 lg:px-8">

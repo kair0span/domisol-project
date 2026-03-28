@@ -147,7 +147,7 @@ function ScoresPage() {
             />
             {(q ||
               color !== "all") && (
-              category !== "all" ||
+              category !== "all" &&
               sort !== "title_asc" ||
               <Button
                 variant="ghost"
@@ -187,7 +187,7 @@ function ScoresPage() {
                 updateSearch({ color: value as ScoreSearch["color"] })
               }
             >
-              <SelectTrigger className="w-35">
+              <SelectTrigger className="w-32">
                 <SelectValue placeholder="Filter by" />
               </SelectTrigger>
               <SelectContent>
@@ -209,7 +209,7 @@ function ScoresPage() {
                 updateSearch({ sort: value as ScoreSearch["sort"] })
               }
             >
-              <SelectTrigger className="w-35">
+              <SelectTrigger className="w-32">
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent>

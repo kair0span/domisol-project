@@ -13,7 +13,10 @@ export default function Header() {
       <nav className="flex gap-4">
         <ModeToggle />
         <Button asChild>
-          <Link to="/auth/login">Login</Link>
+          <Link to="/login">Login</Link>
+        </Button>
+        <Button asChild>
+          <Link to="/signup">Sign Up</Link>
         </Button>
       </nav>
     </header>

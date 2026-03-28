@@ -1,0 +1,34 @@
+import { LoginForm } from "#/components/auth/login-form";
+import { createFileRoute, Link } from "@tanstack/react-router";
+
+export const Route = createFileRoute("/_auth/login/")({
+  component: RouteComponent,
+});
+
+function RouteComponent() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div className="text-center">
+          <h2 className="mt-6 text-3xl font-extrabold text-foreground">
+            Sign in to your account
+          </h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Don&apos;t have an account?
+            <Link
+              to="/signup"
+              className="font-medium text-primary hover:text-primary/90"
+            >
+              Create one here
+            </Link>
+          </p>
+        </div>
+        <LoginForm
+          onSubmit={async (data) => {
+            console.log(data);
+          }}
+        />
+      </div>
+    </div>
+  );
+}

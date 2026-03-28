@@ -240,9 +240,7 @@ function ScoreAddForm({
 
               <Field name="lyricist">
                 {(field) => (
-                  <div
-                    className={cn(fieldGroupClass, "sm:col-span-2")}
-                  >
+                  <div className={cn(fieldGroupClass, "sm:col-span-2")}>
                     <div className={labelToControlClass}>
                       <label htmlFor="score-lyricist" className={labelClass}>
                         Lyricist <span className="text-destructive">*</span>
@@ -416,7 +414,10 @@ function ScoreAddForm({
 
           <Separator className="bg-border/60" />
 
-          <section className="space-y-4" aria-labelledby="score-section-content">
+          <section
+            className="space-y-4"
+            aria-labelledby="score-section-content"
+          >
             <div className="space-y-1">
               <h3
                 id="score-section-content"
