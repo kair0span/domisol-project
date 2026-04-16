@@ -1,5 +1,5 @@
 {
-  "id": "9bb63144-1b70-4d13-bb31-5256ad99e69d",
+  "id": "85b14d2f-a723-4355-870e-a43af53a6e0f",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -17,6 +17,12 @@
         },
         "title": {
           "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "file_url": {
+          "name": "file_url",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -77,6 +83,12 @@
         },
         "lyrics": {
           "name": "lyrics",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lyrics_de": {
+          "name": "lyrics_de",
           "type": "text",
           "primaryKey": false,
           "notNull": true

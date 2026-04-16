@@ -4,6 +4,7 @@ export const ScoreSchema = z
   .object({
     id: z.string().uuid(),
     title: z.string().min(1, "Title is required").max(100),
+    fileUrl: z.string().min(1, "File URL is required").max(1000),
     composer: z.string().min(1, "Composer is required").max(100),
     lyricist: z.string().min(1, "Lyricist is required").max(100),
     location: z.string().min(1, "Location is required").max(100),
@@ -13,6 +14,7 @@ export const ScoreSchema = z
     color: z.string().min(1, "Color is required").max(100),
     key: z.string().min(1, "Key is required").max(100),
     lyrics: z.string().min(1, "Lyrics is required").max(10000),
+    lyricsDe: z.string().min(1, "Lyrics DE is required").max(10000),
     description: z.string().min(1, "Description is required").max(10000),
     createdAt: z.iso.datetime(),
     userId: z.string().uuid().min(1, "UserId is required").max(10000),

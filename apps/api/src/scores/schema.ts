@@ -5,6 +5,7 @@ import { users } from '../users/schema';
 export const scores = pgTable('scores', {
     id: uuid('id').primaryKey().defaultRandom(),
     title: text('title').notNull(),
+    fileUrl: text('file_url').notNull(),
     composer: text('composer').notNull(),
     lyricist: text('lyricist').notNull(),
     location: text('location').notNull(),
@@ -15,6 +16,7 @@ export const scores = pgTable('scores', {
     key: text('key').notNull(),
     description: text('description').notNull(),
     lyrics: text('lyrics').notNull(),
+    lyricsDe: text('lyrics_de').notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     userId: uuid('user_id').references(() => users.id).notNull()
 });
