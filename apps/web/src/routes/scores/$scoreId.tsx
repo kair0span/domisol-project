@@ -10,7 +10,7 @@ export const Route = createFileRoute("/scores/$scoreId")({
 
 function ScorePage() {
   const score = Route.useLoaderData();
-  const { title, lyrics, description } = score;
+  const { lyrics, description, fileUrl } = score;
 
   return (
     <div className="mx-auto flex h-full max-w-7xl p-3 gap-6 px-4 sm:px-6 lg:px-8">
@@ -34,7 +34,7 @@ function ScorePage() {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="partitur">
-          <p>{title}</p>
+          <p>{fileUrl}</p>
         </TabsContent>
         <TabsContent value="lyrics">
           <p className="text-xl">{lyrics}</p>

@@ -12,7 +12,7 @@ export class UploadService {
     });
   }
 
-  async upload(fileName: string, file: Buffer) {
+  async upload(fileName: string, file: Buffer): Promise<string> {
     await this.s3Client.send(
       new PutObjectCommand({
         Bucket: 'domisol-upload',
@@ -22,5 +22,9 @@ export class UploadService {
           'application/vnd.recordare.musicxml+xml, application/vnd.recordare.musicxml, image/jpg, image/jpeg',
       }),
     );
+
+    // Construct and return the file URL
+    const region = this.configService.getOrThrow('AWS_S3_REGION');
+    return `https://domisol-upload.s3.${region}.amazonaws.com/${fileName}`;
   }
 }

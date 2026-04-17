@@ -28,11 +28,15 @@ export class UploadController {
     )
     file: Express.Multer.File,
   ) {
-    await this.uploadService.upload(file.originalname, file.buffer);
+    const fileUrl = await this.uploadService.upload(
+      file.originalname,
+      file.buffer,
+    );
     return {
       message: 'File uploaded successfully',
       filename: file.originalname,
       size: file.size,
+      url: fileUrl,
     };
   }
 }

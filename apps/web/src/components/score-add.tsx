@@ -20,6 +20,7 @@ import { addScore, uploadFile, type CreateScore } from "#/lib/api";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
+  fileUrl: z.string().optional(),
   composer: z.string().min(1, "Composer is required"),
   lyricist: z.string().min(1, "Lyricist is required"),
   category: z.string().min(1, "Category is required"),
@@ -30,6 +31,7 @@ const formSchema = z.object({
   description: z.string().min(1, "Description is required"),
   date: z.string().min(1, "Date is required"),
   lyrics: z.string().min(1, "Lyrics is required"),
+  lyricsDe: z.string().min(1, "Lyrics (DE) is required"),
   userId: z.string().min(1, "UserId is required"),
   file: z.any().refine((file) => file, "Score file is required"),
 });
@@ -136,20 +138,23 @@ function ScoreAddForm({
       description: "",
       date: "",
       lyrics: "",
-      userId: "df63f948-1b5d-4f57-abf8-dea6f0d54307",
-      file: null,
-    } as CreateScore & { file: File | null },
+      lyricsDe: "",
+      userId: "bbbca6b8-33f7-43d9-a351-1804a94313db",
+      file: null as File | null,
+    },
     onSubmit: async ({ value }) => {
       try {
         setIsUploading(true);
         setUploadError(null);
 
+        let fileUrl = "";
         if (value.file) {
-          await uploadFile(value.file);
+          const uploadResult = await uploadFile(value.file);
+          fileUrl = uploadResult.url;
         }
 
         const { file: _, ...scoreData } = value;
-        await addScore(scoreData as CreateScore);
+        await addScore({ ...scoreData, fileUrl } as CreateScore);
         await onSuccess?.();
         onClose();
       } catch (error) {
@@ -465,6 +470,27 @@ function ScoreAddForm({
                       onChange={(e) => field.handleChange(e.target.value)}
                       onBlur={() => field.handleBlur()}
                       placeholder="Full lyrics"
+                    />
+                  </div>
+                  <FieldError field={field} />
+                </div>
+              )}
+            </Field>
+
+            <Field name="lyricsDe">
+              {(field) => (
+                <div className={fieldGroupClass}>
+                  <div className={labelToControlClass}>
+                    <label htmlFor="score-lyrics-de" className={labelClass}>
+                      Lyrics (DE) <span className="text-destructive">*</span>
+                    </label>
+                    <Textarea
+                      id="score-lyrics-de"
+                      className="min-h-[140px] resize-y rounded-2xl border border-input bg-input/30 px-3 py-2.5 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 md:text-sm"
+                      value={field.state.value}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      onBlur={() => field.handleBlur()}
+                      placeholder="German translation of lyrics"
                     />
                   </div>
                   <FieldError field={field} />
