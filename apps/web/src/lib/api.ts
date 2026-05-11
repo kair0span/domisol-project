@@ -63,3 +63,13 @@ export const uploadFile = async (file: File) => {
 
   return res.json();
 };
+
+export const fetchScoreFile = async (scoreId: string) => {
+  const res = await fetch(`${API_URL}/scores/${scoreId}/file`);
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch score file: ${res.statusText}`);
+  }
+
+  return res.text();
+};

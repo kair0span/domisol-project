@@ -1,7 +1,14 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "#/components/ui/tabs";
 import { fetchScore } from "#/lib/api";
 import { createFileRoute } from "@tanstack/react-router";
-import { CirclePlay, FileText, Info, ListMusic } from "lucide-react";
+import {
+  CirclePlay,
+  FileText,
+  Info,
+  ListMusic,
+} from "lucide-react";
+import ScoreViewer from "#/components/score-viewer";
+import LyricsViewer from "#/components/lyrics-viewer";
 
 export const Route = createFileRoute("/scores/$scoreId")({
   component: ScorePage,
@@ -10,37 +17,37 @@ export const Route = createFileRoute("/scores/$scoreId")({
 
 function ScorePage() {
   const score = Route.useLoaderData();
-  const { lyrics, description, fileUrl } = score;
+  const { lyrics, description } = score;
 
   return (
-    <div className="mx-auto flex h-full max-w-7xl p-3 gap-6 px-4 sm:px-6 lg:px-8">
-      <Tabs defaultValue="partitur">
-        <TabsList>
-          <TabsTrigger value="partitur">
-            <ListMusic />
-            Partitur
+    <div className="mx-auto flex h-full max-w-7xl gap-6 px-4 py-3 sm:px-6 lg:px-8">
+      <Tabs defaultValue="preview" className="w-full gap-4 py-10">
+        <TabsList className="w-full">
+          <TabsTrigger value="preview">
+            <ListMusic className="size-5" />
+            Партитура
           </TabsTrigger>
           <TabsTrigger value="lyrics">
-            <FileText />
-            Lyrics
+            <FileText className="size-5" />
+            Текст
+          </TabsTrigger>
+          <TabsTrigger value="description">
+            <Info className="size-5" />
+            Описание
           </TabsTrigger>
           <TabsTrigger value="player">
-            <CirclePlay />
-            Player
-          </TabsTrigger>
-          <TabsTrigger value="info">
-            <Info />
-            Info
+            <CirclePlay className="size-5" />
+            Плеър
           </TabsTrigger>
         </TabsList>
-        <TabsContent value="partitur">
-          <p>{fileUrl}</p>
+        <TabsContent value="preview" className="mt-4">
+          <ScoreViewer score={score} />
         </TabsContent>
         <TabsContent value="lyrics">
-          <p className="text-xl">{lyrics}</p>
+          <LyricsViewer lyrics={lyrics} />
         </TabsContent>
+        <TabsContent value="description">{description}</TabsContent>
         <TabsContent value="player">Hear the music here.</TabsContent>
-        <TabsContent value="info">{description}</TabsContent>
       </Tabs>
     </div>
   );
