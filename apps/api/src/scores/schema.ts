@@ -15,8 +15,14 @@ export const scores = pgTable('scores', {
     color: text('color').notNull(),
     key: text('key').notNull(),
     description: text('description').notNull(),
+    descriptionDe: text('description_de').notNull(),
+    descriptionFr: text('description_fr').notNull(),
+    descriptionEn: text('description_en').notNull(),
     lyrics: text('lyrics').notNull(),
+    lyricsTrans: text('lyrics_trans').notNull(),
     lyricsDe: text('lyrics_de').notNull(),
+    lyricsFr: text('lyrics_fr').notNull(),
+    lyricsEn: text('lyrics_en').notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     userId: uuid('user_id').references(() => users.id).notNull()
 });

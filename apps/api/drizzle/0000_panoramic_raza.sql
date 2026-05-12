@@ -12,8 +12,14 @@ CREATE TABLE "scores" (
 	"color" text NOT NULL,
 	"key" text NOT NULL,
 	"description" text NOT NULL,
+	"description_de" text NOT NULL,
+	"description_fr" text NOT NULL,
+	"description_en" text NOT NULL,
 	"lyrics" text NOT NULL,
+	"lyrics_trans" text NOT NULL,
 	"lyrics_de" text NOT NULL,
+	"lyrics_fr" text NOT NULL,
+	"lyrics_en" text NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"user_id" uuid NOT NULL
 );

@@ -29,9 +29,15 @@ const formSchema = z.object({
   location: z.string().min(1, "Location is required"),
   genre: z.string().min(1, "Genre is required"),
   description: z.string().min(1, "Description is required"),
+  descriptionDe: z.string().min(1, "Description (DE) is required"),
+  descriptionFr: z.string().min(1, "Description (FR) is required"),
+  descriptionEn: z.string().min(1, "Description (EN) is required"),
   date: z.string().min(1, "Date is required"),
   lyrics: z.string().min(1, "Lyrics is required"),
+  lyricsTrans: z.string().min(1, "Lyrics Transliteration is required"),
   lyricsDe: z.string().min(1, "Lyrics (DE) is required"),
+  lyricsFr: z.string().min(1, "Lyrics (FR) is required"),
+  lyricsEn: z.string().min(1, "Lyrics (EN) is required"),
   userId: z.string().min(1, "UserId is required"),
   file: z.any().refine((file) => file, "Score file is required"),
 });
@@ -136,10 +142,16 @@ function ScoreAddForm({
       location: "",
       genre: "",
       description: "",
+      descriptionDe: "",
+      descriptionFr: "",
+      descriptionEn: "",
       date: "",
       lyrics: "",
+      lyricsTrans: "",
       lyricsDe: "",
-      userId: "bbbca6b8-33f7-43d9-a351-1804a94313db",
+      lyricsFr: "",
+      lyricsEn: "",
+      userId: "023a1b5e-6a2e-4740-9a53-42338035075c",
       file: null as File | null,
     },
     onSubmit: async ({ value }) => {
@@ -431,72 +443,80 @@ function ScoreAddForm({
                 Text &amp; notes
               </h3>
               <p className="text-sm text-muted-foreground">
-                Description and full lyrics.
+                Original text and translations for description and lyrics.
               </p>
             </div>
 
-            <Field name="description">
-              {(field) => (
-                <div className={fieldGroupClass}>
-                  <div className={labelToControlClass}>
-                    <label htmlFor="score-description" className={labelClass}>
-                      Description <span className="text-destructive">*</span>
-                    </label>
-                    <Textarea
-                      id="score-description"
-                      className="min-h-[88px] resize-y rounded-2xl border border-input bg-input/30 px-3 py-2.5 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 md:text-sm"
-                      value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      onBlur={() => field.handleBlur()}
-                      placeholder="Notes about this score"
-                    />
-                  </div>
-                  <FieldError field={field} />
-                </div>
-              )}
-            </Field>
-
-            <Field name="lyrics">
-              {(field) => (
-                <div className={fieldGroupClass}>
-                  <div className={labelToControlClass}>
-                    <label htmlFor="score-lyrics" className={labelClass}>
-                      Lyrics <span className="text-destructive">*</span>
-                    </label>
-                    <Textarea
-                      id="score-lyrics"
-                      className="min-h-[140px] resize-y rounded-2xl border border-input bg-input/30 px-3 py-2.5 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 md:text-sm"
-                      value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      onBlur={() => field.handleBlur()}
-                      placeholder="Full lyrics"
-                    />
-                  </div>
-                  <FieldError field={field} />
-                </div>
-              )}
-            </Field>
-
-            <Field name="lyricsDe">
-              {(field) => (
-                <div className={fieldGroupClass}>
-                  <div className={labelToControlClass}>
-                    <label htmlFor="score-lyrics-de" className={labelClass}>
-                      Lyrics (DE) <span className="text-destructive">*</span>
-                    </label>
-                    <Textarea
-                      id="score-lyrics-de"
-                      className="min-h-[140px] resize-y rounded-2xl border border-input bg-input/30 px-3 py-2.5 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 md:text-sm"
-                      value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      onBlur={() => field.handleBlur()}
-                      placeholder="German translation of lyrics"
-                    />
-                  </div>
-                  <FieldError field={field} />
-                </div>
-              )}
-            </Field>
+            <div className="space-y-8">
+              <TextTypeGroup
+                Field={Field}
+                title="Descriptions"
+                fields={[
+                  {
+                    name: "description",
+                    id: "score-description",
+                    label: "Description",
+                    placeholder: "Notes about this score",
+                  },
+                  {
+                    name: "descriptionDe",
+                    id: "score-descriptionDe",
+                    label: "Description (DE)",
+                    placeholder: "German translation of description",
+                  },
+                  {
+                    name: "descriptionFr",
+                    id: "score-descriptionFr",
+                    label: "Description (FR)",
+                    placeholder: "French translation of description",
+                  },
+                  {
+                    name: "descriptionEn",
+                    id: "score-descriptionEn",
+                    label: "Description (EN)",
+                    placeholder: "English translation of description",
+                  },
+                ]}
+                minHeightClass="min-h-[140px]"
+              />
+              <TextTypeGroup
+                Field={Field}
+                title="Lyrics"
+                fields={[
+                  {
+                    name: "lyrics",
+                    id: "score-lyrics",
+                    label: "Lyrics",
+                    placeholder: "Full lyrics",
+                  },
+                  {
+                    name: "lyricsTrans",
+                    id: "score-lyricsTrans",
+                    label: "Lyrics Transliteration",
+                    placeholder: "Transliteration of lyrics",
+                  },
+                  {
+                    name: "lyricsDe",
+                    id: "score-lyricsDe",
+                    label: "Lyrics (DE)",
+                    placeholder: "German translation of lyrics",
+                  },
+                  {
+                    name: "lyricsFr",
+                    id: "score-lyricsFr",
+                    label: "Lyrics (FR)",
+                    placeholder: "French translation of lyrics",
+                  },
+                  {
+                    name: "lyricsEn",
+                    id: "score-lyricsEn",
+                    label: "Lyrics (EN)",
+                    placeholder: "English translation of lyrics",
+                  },
+                ]}
+                minHeightClass="min-h-[200px]"
+              />
+            </div>
           </section>
 
           <Separator className="bg-border/60" />
@@ -516,46 +536,61 @@ function ScoreAddForm({
 
             <Field name="file">
               {(field) => (
-                <div className={fieldGroupClass}>
-                  <div className={labelToControlClass}>
-                    <label htmlFor="score-file" className={labelClass}>
-                      File <span className="text-destructive">*</span>
-                    </label>
-                    <div
-                      className={cn(
-                        "rounded-2xl border border-dashed border-input bg-muted/20 px-4 py-4 transition-colors",
-                        "hover:bg-muted/30 focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/30",
-                      )}
-                    >
-                      <Input
-                        id="score-file"
-                        type="file"
-                        accept=".xml,.musicxml,.mxl,.pdf,.jpg,.jpeg,.png"
-                        className="cursor-pointer border-0 bg-transparent p-0 file:mr-4 file:rounded-lg file:border-0 file:bg-primary/10 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-primary hover:file:bg-primary/15"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          field.handleChange(file || null);
-                          setUploadError(null);
-                        }}
-                        onBlur={() => field.handleBlur()}
-                      />
+                <div className={cn(fieldGroupClass, "gap-3")}>
+                  <label htmlFor="score-file" className={labelClass}>
+                    File <span className="text-destructive">*</span>
+                  </label>
+                  <div
+                    className={cn(
+                      "flex flex-col gap-4 rounded-2xl border border-dashed border-input bg-muted/20 px-4 py-5 sm:px-5 sm:py-6 transition-colors",
+                      "hover:bg-muted/30 focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/30",
+                      uploadError &&
+                        "border-destructive/50 bg-destructive/[0.06] focus-within:border-destructive/60",
+                    )}
+                  >
+                    <Input
+                      id="score-file"
+                      type="file"
+                      accept=".xml,.musicxml,.mxl,.pdf,.jpg,.jpeg,.png"
+                      className="cursor-pointer border-0 bg-transparent p-0 file:mr-4 file:rounded-lg file:border-0 file:bg-primary/10 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-primary hover:file:bg-primary/15"
+                      onClick={(e) => {
+                        // Allow choosing the same file again so onChange fires and errors clear.
+                        (e.currentTarget as HTMLInputElement).value = "";
+                      }}
+                      onChange={(e) => {
+                        setUploadError(null);
+                        const file = e.target.files?.[0];
+                        field.handleChange(file ?? null);
+                      }}
+                      onBlur={() => field.handleBlur()}
+                    />
+                    {field.state.value ? (
+                      <p className="text-sm text-muted-foreground">
+                        Selected:{" "}
+                        <span className="font-medium text-foreground">
+                          {field.state.value.name}
+                        </span>{" "}
+                        ({(field.state.value.size / 1024 / 1024).toFixed(2)}{" "}
+                        MB)
+                      </p>
+                    ) : (
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        Supported: XML, MusicXML, MXL, PDF, JPG, PNG
+                      </p>
+                    )}
+                    <div className="flex flex-col gap-2">
+                      <FieldError field={field} requireTouched />
+                      {uploadError ? (
+                        <p
+                          className="text-sm text-destructive leading-snug"
+                          role="alert"
+                          aria-live="polite"
+                        >
+                          {uploadError}
+                        </p>
+                      ) : null}
                     </div>
                   </div>
-                  {field.state.value && (
-                    <p className="text-sm text-muted-foreground">
-                      Selected: {field.state.value.name} (
-                      {(field.state.value.size / 1024 / 1024).toFixed(2)} MB)
-                    </p>
-                  )}
-                  <p className="text-xs text-muted-foreground">
-                    Supported: XML, MusicXML, MXL, PDF, JPG, PNG
-                  </p>
-                  <FieldError field={field} requireTouched />
-                  {uploadError && (
-                    <p className="text-sm text-destructive" role="alert">
-                      {uploadError}
-                    </p>
-                  )}
                 </div>
               )}
             </Field>
@@ -582,6 +617,106 @@ function ScoreAddForm({
         </Button>
       </DialogFooter>
     </form>
+  );
+}
+
+function TextTypeGroup({
+  Field,
+  title,
+  fields,
+  minHeightClass,
+}: {
+  Field: any;
+  title: string;
+  fields: Array<{
+    name:
+      | "description"
+      | "descriptionDe"
+      | "descriptionFr"
+      | "descriptionEn"
+      | "lyrics"
+      | "lyricsTrans"
+      | "lyricsDe"
+      | "lyricsFr"
+      | "lyricsEn";
+    id: string;
+    label: string;
+    placeholder: string;
+  }>;
+  minHeightClass: string;
+}) {
+  return (
+    <div className="space-y-5 rounded-2xl border border-border/70 bg-muted/20 p-5 sm:p-6">
+      <h4 className="text-sm font-semibold text-foreground">{title}</h4>
+      <div className="flex flex-col gap-6 sm:gap-7">
+        {fields.map((item) => (
+          <TextAreaField
+            key={item.name}
+            Field={Field}
+            name={item.name}
+            id={item.id}
+            label={item.label}
+            placeholder={item.placeholder}
+            minHeightClass={minHeightClass}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function TextAreaField({
+  Field,
+  name,
+  id,
+  label,
+  placeholder,
+  minHeightClass,
+}: {
+  Field: any;
+  name:
+    | "description"
+    | "descriptionDe"
+    | "descriptionFr"
+    | "descriptionEn"
+    | "lyrics"
+    | "lyricsTrans"
+    | "lyricsDe"
+    | "lyricsFr"
+    | "lyricsEn";
+  id: string;
+  label: string;
+  placeholder: string;
+  minHeightClass: string;
+}) {
+  return (
+    <Field name={name}>
+      {(field: {
+        state: { value: string; meta: { errors?: unknown; isTouched?: boolean } };
+        handleChange: (value: string) => void;
+        handleBlur: () => void;
+      }) => (
+        <div className={cn(fieldGroupClass, "gap-3")}>
+          <div className={cn(labelToControlClass, "gap-3")}>
+            <label htmlFor={id} className={labelClass}>
+              {label} <span className="text-destructive">*</span>
+            </label>
+            <Textarea
+              id={id}
+              className={cn(
+                minHeightClass,
+                "min-w-0 w-full resize-y rounded-2xl border border-input bg-input/30 px-3 py-3 text-base leading-relaxed transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 sm:px-4 sm:py-3.5 md:text-sm",
+              )}
+              value={field.state.value}
+              onChange={(e) => field.handleChange(e.target.value)}
+              onBlur={() => field.handleBlur()}
+              placeholder={placeholder}
+            />
+          </div>
+          <FieldError field={field} />
+        </div>
+      )}
+    </Field>
   );
 }
 

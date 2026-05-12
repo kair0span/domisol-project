@@ -1,5 +1,5 @@
 {
-  "id": "c16b595f-9ca8-4fac-9415-4ddfd64a51df",
+  "id": "1038332f-32d1-44c2-8ecb-ad2edd8b1698",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -81,14 +81,50 @@
           "primaryKey": false,
           "notNull": true
         },
+        "description_de": {
+          "name": "description_de",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description_fr": {
+          "name": "description_fr",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description_en": {
+          "name": "description_en",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
         "lyrics": {
           "name": "lyrics",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
+        "lyrics_trans": {
+          "name": "lyrics_trans",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
         "lyrics_de": {
           "name": "lyrics_de",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lyrics_fr": {
+          "name": "lyrics_fr",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lyrics_en": {
+          "name": "lyrics_en",
           "type": "text",
           "primaryKey": false,
           "notNull": true
