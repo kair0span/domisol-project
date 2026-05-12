@@ -14,7 +14,10 @@ export const ScoreSchema = z
     color: z.string().min(1, "Color is required").max(100),
     key: z.string().min(1, "Key is required").max(100),
     lyrics: z.string().min(1, "Lyrics is required").max(10000),
-    lyricsTrans: z.string().min(1, "Lyrics Transliteration is required").max(10000),
+    lyricsTrans: z
+      .string()
+      .min(1, "Lyrics Transliteration is required")
+      .max(10000),
     lyricsDe: z.string().min(1, "Lyrics DE is required").max(10000),
     lyricsFr: z.string().min(1, "Lyrics FR is required").max(10000),
     lyricsEn: z.string().min(1, "Lyrics EN is required").max(10000),

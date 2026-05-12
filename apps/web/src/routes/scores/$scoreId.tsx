@@ -17,7 +17,7 @@ export const Route = createFileRoute("/scores/$scoreId")({
 
 function ScorePage() {
   const score = Route.useLoaderData();
-  const { lyrics, description } = score;
+  const { lyrics, lyricsTrans, lyricsDe, lyricsEn, lyricsFr, description } = score;
 
   return (
     <div className="mx-auto flex h-full max-w-7xl gap-6 px-4 py-3 sm:px-6 lg:px-8">
@@ -44,7 +44,13 @@ function ScorePage() {
           <ScoreViewer score={score} />
         </TabsContent>
         <TabsContent value="lyrics">
-          <LyricsViewer lyrics={lyrics} />
+          <LyricsViewer
+            lyrics={lyrics}
+            lyricsTrans={lyricsTrans}
+            lyricsDe={lyricsDe}
+            lyricsEn={lyricsEn}
+            lyricsFr={lyricsFr}
+          />
         </TabsContent>
         <TabsContent value="description">{description}</TabsContent>
         <TabsContent value="player">Hear the music here.</TabsContent>

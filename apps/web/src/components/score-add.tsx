@@ -570,8 +570,7 @@ function ScoreAddForm({
                         <span className="font-medium text-foreground">
                           {field.state.value.name}
                         </span>{" "}
-                        ({(field.state.value.size / 1024 / 1024).toFixed(2)}{" "}
-                        MB)
+                        ({(field.state.value.size / 1024 / 1024).toFixed(2)} MB)
                       </p>
                     ) : (
                       <p className="text-xs text-muted-foreground leading-relaxed">
@@ -692,7 +691,10 @@ function TextAreaField({
   return (
     <Field name={name}>
       {(field: {
-        state: { value: string; meta: { errors?: unknown; isTouched?: boolean } };
+        state: {
+          value: string;
+          meta: { errors?: unknown; isTouched?: boolean };
+        };
         handleChange: (value: string) => void;
         handleBlur: () => void;
       }) => (
