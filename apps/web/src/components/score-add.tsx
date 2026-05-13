@@ -20,6 +20,7 @@ import { addScore, uploadFile, type CreateScore } from "#/lib/api";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
+  titleTrans: z.string().min(1, "Title Transliteration is required"),
   fileUrl: z.string().optional(),
   composer: z.string().min(1, "Composer is required"),
   lyricist: z.string().min(1, "Lyricist is required"),
@@ -134,6 +135,7 @@ function ScoreAddForm({
   const { Field, handleSubmit } = useForm({
     defaultValues: {
       title: "",
+      titleTrans: "",
       composer: "",
       lyricist: "",
       category: "",
@@ -151,7 +153,7 @@ function ScoreAddForm({
       lyricsDe: "",
       lyricsFr: "",
       lyricsEn: "",
-      userId: "023a1b5e-6a2e-4740-9a53-42338035075c",
+      userId: "9853673f-d1e6-4bf0-91a8-9418ad21c43a",
       file: null as File | null,
     },
     onSubmit: async ({ value }) => {
@@ -232,6 +234,31 @@ function ScoreAddForm({
                   </div>
                 )}
               </Field>
+              <Field name="titleTrans">
+                {(field) => (
+                  <div className={fieldGroupClass}>
+                    <div className={labelToControlClass}>
+                      <label htmlFor="score-title-trans" className={labelClass}>
+                        Title Transliteration <span className="text-destructive">*</span>
+                      </label>
+                      <Input
+                        id="score-title-trans"
+                        type="text"
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        onBlur={() => field.handleBlur()}
+                        placeholder="Score title transliteration"
+                        autoComplete="off"
+                        aria-invalid={
+                          !!field.state.meta.errors?.length &&
+                          field.state.meta.isTouched
+                        }
+                      />
+                    </div>
+                    <FieldError field={field} requireTouched />
+                  </div>
+                )}
+              </Field>
 
               <Field name="composer">
                 {(field) => (
@@ -257,7 +284,7 @@ function ScoreAddForm({
 
               <Field name="lyricist">
                 {(field) => (
-                  <div className={cn(fieldGroupClass, "sm:col-span-2")}>
+                  <div  className={fieldGroupClass}>
                     <div className={labelToControlClass}>
                       <label htmlFor="score-lyricist" className={labelClass}>
                         Lyricist <span className="text-destructive">*</span>

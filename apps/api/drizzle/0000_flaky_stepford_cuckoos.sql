@@ -2,6 +2,7 @@ CREATE TYPE "public"."user_role" AS ENUM('admin', 'user', 'moderator');--> state
 CREATE TABLE "scores" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"title" text NOT NULL,
+	"title_trans" text NOT NULL,
 	"file_url" text NOT NULL,
 	"composer" text NOT NULL,
 	"lyricist" text NOT NULL,
