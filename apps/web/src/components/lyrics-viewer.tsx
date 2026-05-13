@@ -7,9 +7,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "#/components/ui/select";
-import { Badge } from "#/components/ui/badge";
+import type React from "react";
 
 type LyricsViewerProps = {
+  title: string;
+  titleTrans: string;
   lyrics: string;
   lyricsTrans?: string;
   lyricsDe?: string;
@@ -20,7 +22,27 @@ type LyricsViewerProps = {
 type LeftLanguage = "original" | "transliteration";
 type RightLanguage = "de" | "en" | "fr";
 
+// Helper function to split text into stanzas
+function formatStanzas(text: string): React.ReactElement[] {
+  if (!text) return [];
+
+  // Split by double line breaks to identify stanzas
+  const stanzas = text.split(/\n\s*\n/).filter(stanza => stanza.trim());
+
+  return stanzas.map((stanza, index) => (
+    <div key={index} className="mb-8 last:mb-0">
+      {stanza.split('\n').map((line, lineIndex) => (
+        <div key={lineIndex} className="leading-relaxed">
+          {line || '\u00A0'}
+        </div>
+      ))}
+    </div>
+  ));
+}
+
 export default function LyricsViewer({
+  title,
+  titleTrans,
   lyrics,
   lyricsTrans = "",
   lyricsDe = "",
@@ -47,14 +69,22 @@ export default function LyricsViewer({
     return lyricsDe || "No German translation available.";
   }, [rightLanguage, lyricsDe, lyricsEn, lyricsFr]);
 
+  const leftStanzas = useMemo(() => formatStanzas(leftText), [leftText]);
+  const rightStanzas = useMemo(() => formatStanzas(rightText), [rightText]);
+
   return (
-    <section className="space-y-4 pt-4">
-      <div className="flex items-center justify-between gap-3">
-        <h2 className="text-2xl font-semibold tracking-tight">Lyrics Viewer</h2>
-        <Badge variant="outline">multilingual</Badge>
+    <section className="space-y-6 pt-4">
+      {/* Title Section */}
+      <div className="text-center space-y-2 pb-4 border-b border-border/50">
+        <h1 className="text-3xl sm:text-4xl font-serif font-bold text-foreground tracking-tight">
+          {title}
+        </h1>
+        <p className="text-lg sm:text-xl text-muted-foreground font-light italic">
+          {titleTrans}
+        </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card className="bg-card/70 backdrop-blur-sm">
           <CardHeader className="flex flex-col gap-3 border-b border-border/70">
             <div className="flex items-center justify-between gap-3">
@@ -75,11 +105,13 @@ export default function LyricsViewer({
               </SelectContent>
             </Select>
           </CardHeader>
-          <CardContent>
-            <div className="min-h-[360px] rounded-xl border border-border/60 bg-muted/20 p-4">
-              <p className="whitespace-pre-wrap text-sm leading-7 text-foreground">
-                {leftText}
-              </p>
+          <CardContent className="pt-6">
+            <div className="min-h-[360px] rounded-xl border border-border/60 bg-muted/20 p-6 sm:p-8">
+              <div className="text-base sm:text-lg leading-relaxed text-foreground font-serif">
+                {leftStanzas.length > 0 ? leftStanzas : (
+                  <p className="text-muted-foreground italic">{leftText}</p>
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -103,11 +135,13 @@ export default function LyricsViewer({
               </SelectContent>
             </Select>
           </CardHeader>
-          <CardContent>
-            <div className="min-h-[360px] rounded-xl border border-border/60 bg-muted/20 p-4">
-              <p className="whitespace-pre-wrap text-sm leading-7 text-foreground">
-                {rightText}
-              </p>
+          <CardContent className="pt-6">
+            <div className="min-h-[360px] rounded-xl border border-border/60 bg-muted/20 p-6 sm:p-8">
+              <div className="text-base sm:text-lg leading-relaxed text-foreground font-serif">
+                {rightStanzas.length > 0 ? rightStanzas : (
+                  <p className="text-muted-foreground italic">{rightText}</p>
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>

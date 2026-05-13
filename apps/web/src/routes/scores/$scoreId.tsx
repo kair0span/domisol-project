@@ -1,11 +1,12 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "#/components/ui/tabs";
 import { fetchScore } from "#/lib/api";
-import { createFileRoute } from "@tanstack/react-router";
-import { CirclePlay, FileText, Info, ListMusic } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowLeft, CirclePlay, FileText, Info, ListMusic } from "lucide-react";
 import ScoreViewer from "#/components/score-viewer";
 import LyricsViewer from "#/components/lyrics-viewer";
 import DescriptionViewer from "#/components/description-viewer";
 import { useEffect, useState } from "react";
+import { Button } from "#/components/ui/button";
 
 export const Route = createFileRoute("/scores/$scoreId")({
   component: ScorePage,
@@ -25,14 +26,7 @@ function ScorePage() {
     descriptionEn,
     descriptionFr,
     title,
-    composer,
-    lyricist,
-    location,
-    date,
-    category,
-    genre,
-    color,
-    key,
+
   } = score;
 
   const [activeTab, setActiveTab] = useState<string>(() => {
@@ -47,11 +41,19 @@ function ScorePage() {
   }, [activeTab]);
 
   return (
-    <div className="mx-auto flex h-full max-w-7xl gap-6 px-4 py-3 sm:px-6 lg:px-8">
+    <div className="mx-auto flex h-full max-w-7xl flex-col gap-6 px-4 py-3 sm:px-6 lg:px-8">
+      <div className="pt-2">
+        <Button variant="outline" asChild>
+          <Link to="/scores" className="flex items-center gap-2">
+            <ArrowLeft className="size-4" />
+            Назад към всички
+          </Link>
+        </Button>
+      </div>
       <Tabs
         value={activeTab}
         onValueChange={setActiveTab}
-        className="w-full gap-4 py-10"
+        className="w-full gap-4 py-2"
       >
         <TabsList className="grid w-full grid-cols-4 gap-1">
           <TabsTrigger value="preview">
@@ -76,6 +78,8 @@ function ScorePage() {
         </TabsContent>
         <TabsContent value="lyrics">
           <LyricsViewer
+            title={title}
+            titleTrans={score.titleTrans}
             lyrics={lyrics}
             lyricsTrans={lyricsTrans}
             lyricsDe={lyricsDe}
@@ -86,14 +90,7 @@ function ScorePage() {
         <TabsContent value="description">
           <DescriptionViewer
             title={title}
-            composer={composer}
-            lyricist={lyricist}
-            location={location}
-            date={date}
-            category={category}
-            genre={genre}
-            color={color}
-            key={key}
+            titleTrans={score.titleTrans}
             description={description}
             descriptionDe={descriptionDe}
             descriptionEn={descriptionEn}

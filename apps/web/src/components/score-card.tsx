@@ -211,7 +211,7 @@ export default function ScoreCard({ score }: { score: ScoreResponse }) {
         <Button
           asChild
           size="sm"
-          className="bg-primary/90 hover:bg-primary text-primary-foreground shadow-sm hover:shadow-md transition-all duration-200"
+          className="bg-primary/90 hover:bg-primary text-primary-foreground hover:shadow-md transition-all duration-200"
         >
           <Link to="/scores/$scoreId" params={{ scoreId: id }}>
             Виж повече
