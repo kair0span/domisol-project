@@ -9,7 +9,7 @@ import {
   ChevronRight,
   ArrowDownNarrowWide,
   ArrowUpWideNarrow,
-  ArrowUpNarrowWide,
+  Filter,
 } from "lucide-react";
 import ScoreCard from "#/components/score-card";
 import { Input } from "#/components/ui/input";
@@ -21,6 +21,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "#/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "#/components/ui/dropdown-menu";
 import { ScoreAddModal } from "#/components/score-add";
 
 const scoreSearchSchema = z.object({
@@ -136,99 +143,205 @@ function ScoresPage() {
             <Plus />
           </Button>
         </div>
-        <div className="mb-8 flex items-center gap-4 w-full">
-          {/* Search Input */}
-          <div className="relative flex-1">
-            <Input
-              className="w-full"
-              placeholder="Търсене по заглавие ..."
-              value={q}
-              onChange={(e) => updateSearch({ q: e.target.value })}
-            />
-            {(q ||
-              color !== "all") && (
-              category !== "all" &&
-              sort !== "title_asc" ||
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={clearFilters}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 px-2"
+        {/* Filter and Search Section */}
+        <div className="mb-8 space-y-4">
+          {/* Mobile: Stack vertically, Desktop: Horizontal layout */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full">
+            {/* Category Filter - Left on desktop, full width on mobile */}
+            <div className="w-full sm:w-auto sm:flex-shrink-0">
+              <Select
+                value={category}
+                onValueChange={(value) =>
+                  updateSearch({ category: value as ScoreSearch["category"] })
+                }
               >
-                <X className="w-4 h-4" />
-              </Button>
-            )}
+                <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectValue placeholder="По категории" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Всички категории</SelectItem>
+                  <SelectItem value="братски">Братски</SelectItem>
+                  <SelectItem value="от Учителя">От Учителя</SelectItem>
+                  <SelectItem value="след 1944">След 1944</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Search Input - Center on desktop, full width on mobile */}
+            <div className="relative flex-1 w-full">
+              <Input
+                className="w-full pr-10"
+                placeholder="Търсене по заглавие ..."
+                value={q}
+                onChange={(e) => updateSearch({ q: e.target.value })}
+              />
+              {q && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => updateSearch({ q: "" })}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 px-2"
+                  aria-label="Clear search"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              )}
+            </div>
+
+            {/* Filter Menu - Right on desktop, full width on mobile */}
+            <div className="w-full sm:w-auto sm:flex-shrink-0">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="w-full sm:w-auto gap-2">
+                    <Filter className="w-4 h-4" />
+                    <span>Филтри</span>
+                    {(color !== "all" || sort !== "title_asc") && (
+                      <span className="ml-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
+                        {(color !== "all" ? 1 : 0) + (sort !== "title_asc" ? 1 : 0)}
+                      </span>
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-[calc(100vw-2rem)] sm:w-80" align="end">
+                  <div className="p-4 space-y-4">
+                    <div className="space-y-2">
+                      <DropdownMenuLabel className="px-0">Цвят</DropdownMenuLabel>
+                      <Select
+                        value={color}
+                        onValueChange={(value) =>
+                          updateSearch({ color: value as ScoreSearch["color"] })
+                        }
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Избери цвят" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Всички цветове</SelectItem>
+                          <SelectItem value="red">Червен</SelectItem>
+                          <SelectItem value="orange">Оранжев</SelectItem>
+                          <SelectItem value="yellow">Жълт</SelectItem>
+                          <SelectItem value="green">Зелен</SelectItem>
+                          <SelectItem value="blue">Син</SelectItem>
+                          <SelectItem value="darkblue">Тъмносин</SelectItem>
+                          <SelectItem value="purple">Виолетов</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <DropdownMenuSeparator />
+
+                    <div className="space-y-2">
+                      <DropdownMenuLabel className="px-0">Сортиране</DropdownMenuLabel>
+                      <Select
+                        value={sort}
+                        onValueChange={(value) =>
+                          updateSearch({ sort: value as ScoreSearch["sort"] })
+                        }
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Избери сортиране" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="title_asc">
+                            <div className="flex items-center gap-2">
+                              <ArrowDownNarrowWide className="w-4 h-4" />
+                              <span>Заглавие (А-Я)</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="title_desc">
+                            <div className="flex items-center gap-2">
+                              <ArrowUpWideNarrow className="w-4 h-4" />
+                              <span>Заглавие (Я-А)</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="date_asc">
+                            <div className="flex items-center gap-2">
+                              <ArrowDownNarrowWide className="w-4 h-4" />
+                              <span>Дата (възходящо)</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="date_desc">
+                            <div className="flex items-center gap-2">
+                              <ArrowUpWideNarrow className="w-4 h-4" />
+                              <span>Дата (низходящо)</span>
+                            </div>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {(category !== "all" || color !== "all" || sort !== "title_asc" || q) && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={clearFilters}
+                          className="w-full"
+                        >
+                          <X className="w-4 h-4 mr-2" />
+                          Изчисти всички филтри
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
 
-          {/* Filter Controls */}
-
-          <div className="flex items-center gap-2">
-            <Select
-              value={category}
-              onValueChange={(value) =>
-                updateSearch({ category: value as ScoreSearch["category"] })
-              }
-            >
-              <SelectTrigger className="w-35">
-                <SelectValue placeholder="Filter by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">По категории</SelectItem>
-                <SelectItem value="братски">Братски</SelectItem>
-                <SelectItem value="от Учителя">От Учителя</SelectItem>
-                <SelectItem value="след 1944">След 1944</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex items-center gap-2">
-            <Select
-              value={color}
-              onValueChange={(value) =>
-                updateSearch({ color: value as ScoreSearch["color"] })
-              }
-            >
-              <SelectTrigger className="w-32">
-                <SelectValue placeholder="Filter by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">По цветове</SelectItem>
-                <SelectItem value="red">Червен</SelectItem>
-                <SelectItem value="orange">Оранжев</SelectItem>
-                <SelectItem value="yellow">Жълт</SelectItem>
-                <SelectItem value="green">Зелен</SelectItem>
-                <SelectItem value="blue">Син</SelectItem>
-                <SelectItem value="darkblue">Тъмносин</SelectItem>
-                <SelectItem value="purple">Виолетов</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex items-center gap-2">
-            <Select
-              value={sort}
-              onValueChange={(value) =>
-                updateSearch({ sort: value as ScoreSearch["sort"] })
-              }
-            >
-              <SelectTrigger className="w-32">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="title_asc">
-                  Заглавие <ArrowDownNarrowWide />
-                </SelectItem>
-                <SelectItem value="title_desc">
-                  Заглавие <ArrowUpWideNarrow />
-                </SelectItem>
-                <SelectItem value="date_asc">
-                  Дата <ArrowDownNarrowWide />
-                </SelectItem>
-                <SelectItem value="date_desc">
-                  Дата <ArrowUpNarrowWide />
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          {/* Active Filters Display - Shows on mobile for better UX */}
+          {(category !== "all" || color !== "all" || sort !== "title_asc" || q) && (
+            <div className="flex flex-wrap items-center gap-2 text-sm">
+              <span className="text-muted-foreground">Активни филтри:</span>
+              {category !== "all" && (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => updateSearch({ category: "all" })}
+                  className="h-7 text-xs"
+                >
+                  {category}
+                  <X className="w-3 h-3 ml-1" />
+                </Button>
+              )}
+              {color !== "all" && (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => updateSearch({ color: "all" })}
+                  className="h-7 text-xs"
+                >
+                  Цвят: {color === "red" ? "Червен" : color === "orange" ? "Оранжев" : color === "yellow" ? "Жълт" : color === "green" ? "Зелен" : color === "blue" ? "Син" : color === "darkblue" ? "Тъмносин" : "Виолетов"}
+                  <X className="w-3 h-3 ml-1" />
+                </Button>
+              )}
+              {sort !== "title_asc" && (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => updateSearch({ sort: "title_asc" })}
+                  className="h-7 text-xs"
+                >
+                  {sort === "title_desc" ? "Заглавие (Я-А)" : sort === "date_asc" ? "Дата (възходящо)" : "Дата (низходящо)"}
+                  <X className="w-3 h-3 ml-1" />
+                </Button>
+              )}
+              {q && (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => updateSearch({ q: "" })}
+                  className="h-7 text-xs"
+                >
+                  Търсене: "{q}"
+                  <X className="w-3 h-3 ml-1" />
+                </Button>
+              )}
+            </div>
+          )}
         </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
           {paginatedScores.map((score) => (
             <ScoreCard key={score.id} score={score} />

@@ -69,7 +69,9 @@ export default function LyricsViewer({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="original">Original text</SelectItem>
-                <SelectItem value="transliteration">Transliterated text</SelectItem>
+                <SelectItem value="transliteration">
+                  Transliterated text
+                </SelectItem>
               </SelectContent>
             </Select>
           </CardHeader>
@@ -87,7 +89,9 @@ export default function LyricsViewer({
             <CardTitle>Translations</CardTitle>
             <Select
               value={rightLanguage}
-              onValueChange={(value) => setRightLanguage(value as RightLanguage)}
+              onValueChange={(value) =>
+                setRightLanguage(value as RightLanguage)
+              }
             >
               <SelectTrigger className="w-full sm:w-64">
                 <SelectValue placeholder="Choose translation" />
